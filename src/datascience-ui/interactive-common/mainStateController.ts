@@ -915,7 +915,8 @@ export class MainStateController implements IMessageHandler {
             // Have to make a copy of the cell VM array or
             // we won't actually update.
             const newVMs = [...this.state.cellVMs];
-            newVMs[index].cell = cloneDeep(cell);
+            newVMs[index] = cloneDeep(newVMs[index]);
+            newVMs[index].cell = cell;
             this.setState({
                 cellVMs: newVMs,
                 currentExecutionCount: newExecutionCount

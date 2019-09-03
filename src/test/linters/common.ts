@@ -31,7 +31,7 @@ import {
     ILogger,
     IMypyCategorySeverity,
     IOutputChannel,
-    IPycodestyleCategorySeverity,
+    IPep8CategorySeverity,
     IPylintCategorySeverity,
     IPythonSettings
 } from '../../client/common/types';
@@ -95,8 +95,8 @@ export class LintingSettings {
     public prospectorArgs: string[];
     public pylintEnabled: boolean;
     public pylintArgs: string[];
-    public pycodestyleEnabled: boolean;
-    public pycodestyleArgs: string[];
+    public pep8Enabled: boolean;
+    public pep8Args: string[];
     public pylamaEnabled: boolean;
     public pylamaArgs: string[];
     public flake8Enabled: boolean;
@@ -106,12 +106,12 @@ export class LintingSettings {
     public lintOnSave: boolean;
     public maxNumberOfProblems: number;
     public pylintCategorySeverity: IPylintCategorySeverity;
-    public pycodestyleCategorySeverity: IPycodestyleCategorySeverity;
+    public pep8CategorySeverity: IPep8CategorySeverity;
     public flake8CategorySeverity: Flake8CategorySeverity;
     public mypyCategorySeverity: IMypyCategorySeverity;
     public prospectorPath: string;
     public pylintPath: string;
-    public pycodestylePath: string;
+    public pep8Path: string;
     public pylamaPath: string;
     public flake8Path: string;
     public pydocstylePath: string;
@@ -152,10 +152,10 @@ export class LintingSettings {
         this.banditPath = 'bandit';
         this.banditArgs = [];
 
-        this.pycodestyleEnabled = false;
-        this.pycodestylePath = 'pycodestyle';
-        this.pycodestyleArgs = [];
-        this.pycodestyleCategorySeverity = {
+        this.pep8Enabled = false;
+        this.pep8Path = 'pep8';
+        this.pep8Args = [];
+        this.pep8CategorySeverity = {
             E: DiagnosticSeverity.Error,
             W: DiagnosticSeverity.Warning
         };
@@ -344,8 +344,8 @@ export class BaseTestFixture {
             })
             .returns(() => Promise.resolve(undefined));
 
-        this.pythonSettings.setup(s => s.jediEnabled)
-            .returns(() => true);
+        this.pythonSettings.setup(s => s.languageServer)
+            .returns(() => 'jedi');
     }
 
     private initData(): void {

@@ -6,7 +6,7 @@ bandit
 black ; python_version>='3.6'
 yapf
 pylint
-pycodestyle
+pep8
 prospector
 pydocstyle
 nose

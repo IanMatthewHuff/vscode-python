@@ -158,7 +158,7 @@ suite('Interactive window command listener', async () => {
             codeRegularExpression: '^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])',
             markdownRegularExpression: '^(#\\s*%%\\s*\\[markdown\\]|#\\s*\\<markdowncell\\>)',
             enablePlotViewer: true,
-            runStartupCommands: '',
+            runMagicCommands: '',
             debugJustMyCode: true
         };
 

@@ -44,12 +44,12 @@ export enum OSType {
 export type PythonSettingKeys = 'workspaceSymbols.enabled' | 'pythonPath' |
     'linting.lintOnSave' |
     'linting.enabled' | 'linting.pylintEnabled' |
-    'linting.flake8Enabled' | 'linting.pycodestyleEnabled' | 'linting.pylamaEnabled' |
+    'linting.flake8Enabled' | 'linting.pep8Enabled' | 'linting.pylamaEnabled' |
     'linting.prospectorEnabled' | 'linting.pydocstyleEnabled' | 'linting.mypyEnabled' | 'linting.banditEnabled' |
     'testing.nosetestArgs' | 'testing.pytestArgs' | 'testing.unittestArgs' |
     'formatting.provider' | 'sortImports.args' |
     'testing.nosetestsEnabled' | 'testing.pytestEnabled' | 'testing.unittestEnabled' |
-    'envFile' | 'jediEnabled' | 'linting.ignorePatterns' | 'terminal.activateEnvironment';
+    'envFile' | 'languageServer' | 'linting.ignorePatterns' | 'terminal.activateEnvironment';
 
 async function disposePythonSettings() {
     if (!IS_SMOKE_TEST) {

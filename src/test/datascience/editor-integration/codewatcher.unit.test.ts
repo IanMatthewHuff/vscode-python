@@ -92,7 +92,7 @@ suite('DataScience Code Watcher Unit Tests', () => {
             markdownRegularExpression: '^(#\\s*%%\\s*\\[markdown\\]|#\\s*\\<markdowncell\\>)',
             enableCellCodeLens: true,
             enablePlotViewer: true,
-            runStartupCommands: '',
+            runMagicCommands: '',
             debugJustMyCode: true
         };
         debugService.setup(d => d.activeDebugSession).returns(() => undefined);

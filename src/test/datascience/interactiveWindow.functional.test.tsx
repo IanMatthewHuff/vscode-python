@@ -295,7 +295,7 @@ for _ in range(50):
             return Promise.resolve();
         });
 
-        assert.equal(afterUndo.length, 1, `Undo should remove cells + ${afterUndo.debug()}`);
+        assert.equal(afterUndo.length, 1, `Undo should remove cells`);
 
         // Redo should put the cells back
         const afterRedo = await getCellResults(wrapper, 1, async () => {

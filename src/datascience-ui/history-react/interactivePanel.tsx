@@ -64,6 +64,8 @@ export class InteractivePanel extends React.Component<IInteractivePanelProps, IM
     }
 
     public render() {
+        // Update the state controller with our new state
+        this.stateController.renderUpdate(this.state);
 
         // If in test mode, update our count. Use this to determine how many renders a normal update takes.
         if (this.props.testMode) {

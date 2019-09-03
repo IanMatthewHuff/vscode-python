@@ -841,18 +841,23 @@ export abstract class InteractiveBase extends WebViewHost<IInteractiveWindowMapp
         this.loadPromise = this.reloadWithNew();
     }
 
+    private async stopServer(): Promise<void> {
+        if (this.loadPromise) {
+            await this.loadPromise;
+            this.loadPromise = undefined;
+            if (this.notebook) {
+                const server = this.notebook;
+                this.notebook = undefined;
+                await server.dispose();
+            }
+        }
+    }
+
     private async reloadWithNew(): Promise<void> {
         const status = this.setStatus(localize.DataScience.startingJupyter());
         try {
-            // Not the same as reload, we need to actually dispose the server.
-            if (this.loadPromise) {
-                await this.loadPromise;
-                if (this.notebook) {
-                    const server = this.notebook;
-                    this.notebook = undefined;
-                    await server.dispose();
-                }
-            }
+            // Not the same as reload, we need to actually wait for the server.
+            await this.stopServer();
             await this.startServer();
             await this.addSysInfo(SysInfoReason.New);
         } finally {
@@ -862,14 +867,7 @@ export abstract class InteractiveBase extends WebViewHost<IInteractiveWindowMapp
 
     private async reloadAfterShutdown(): Promise<void> {
         try {
-            if (this.loadPromise) {
-                await this.loadPromise;
-                if (this.notebook) {
-                    const server = this.notebook;
-                    this.notebook = undefined;
-                    server.dispose().ignoreErrors(); // Don't care what happens as we're disconnected.
-                }
-            }
+            this.stopServer().ignoreErrors();
         } catch {
             // We just switched from host to guest mode. Don't really care
             // if closing the host server kills it.
@@ -952,7 +950,7 @@ export abstract class InteractiveBase extends WebViewHost<IInteractiveWindowMapp
 
     private showInformationMessage(message: string, question1: string, question2?: string): Thenable<string | undefined> {
         if (question2) {
-            return this.applicationShell.showInformationMessage(message, question1,  question2);
+            return this.applicationShell.showInformationMessage(message, question1, question2);
         } else {
             return this.applicationShell.showInformationMessage(message, question1);
         }

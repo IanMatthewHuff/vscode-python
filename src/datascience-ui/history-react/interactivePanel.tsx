@@ -27,10 +27,11 @@ interface IInteractivePanelProps {
 }
 
 export class InteractivePanel extends React.Component<IInteractivePanelProps, IMainState> {
+    // Public for testing
+    public stateController: InteractivePanelStateController;
     private mainPanelRef: React.RefObject<HTMLDivElement> = React.createRef<HTMLDivElement>();
     private editCellRef: React.RefObject<Cell> = React.createRef<Cell>();
     private contentPanelRef: React.RefObject<ContentPanel> = React.createRef<ContentPanel>();
-    private stateController: InteractivePanelStateController;
     private renderCount: number = 0;
 
     constructor(props: IInteractivePanelProps) {

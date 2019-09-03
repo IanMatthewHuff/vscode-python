@@ -10,7 +10,7 @@ import { CancellationToken } from 'vscode';
 
 import { EXTENSION_ROOT_DIR } from '../../client/common/constants';
 import { IDataScienceSettings } from '../../client/common/types';
-//import { InteractiveWindowMessages } from '../../client/datascience/interactive-window/interactiveWindowTypes';
+import { InteractiveWindowMessages } from '../../client/datascience/interactive-common/interactiveWindowTypes';
 import { IInteractiveWindow, IJupyterExecution } from '../../client/datascience/types';
 import { InteractivePanel } from '../../datascience-ui/history-react/interactivePanel';
 import { ImageButton } from '../../datascience-ui/react-common/imageButton';
@@ -345,12 +345,11 @@ export function getMainPanel(wrapper: ReactWrapper<any, Readonly<{}>>): Interact
 }
 
 // Update data science settings while running (goes through the UpdateSettings channel)
-export function updateDataScienceSettings(wrapper: ReactWrapper<any, Readonly<{}>>, _newSettings: IDataScienceSettings) {
-    //const settingsString = JSON.stringify(newSettings);
+export function updateDataScienceSettings(wrapper: ReactWrapper<any, Readonly<{}>>, newSettings: IDataScienceSettings) {
+    const settingsString = JSON.stringify(newSettings);
     const mainPanel = getMainPanel(wrapper);
     if (mainPanel) {
-        assert.fail('Fail until figure out how to send messages');
-        //mainPanel.handleMessage(InteractiveWindowMessages.UpdateSettings, settingsString);
+        mainPanel.stateController.handleMessage(InteractiveWindowMessages.UpdateSettings, settingsString);
     }
     wrapper.update();
 }

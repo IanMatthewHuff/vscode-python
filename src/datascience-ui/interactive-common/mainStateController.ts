@@ -695,7 +695,7 @@ export class MainStateController implements IMessageHandler {
             cellVM = this.alterCellVM(cellVM, showInputs, !collapseInputs);
 
             if (cellVM) {
-                const newList = this.state.cellVMs;
+                const newList = [...this.state.cellVMs];
                 // Make sure to use the same array so our entire state doesn't update
                 if (position && position >= 0) {
                     newList.splice(position, 0, cellVM);
@@ -819,8 +819,9 @@ export class MainStateController implements IMessageHandler {
         // Get the undo stack up to the maximum length
         const slicedUndo = stack.slice(0, min([stack.length, this.stackLimit]));
 
-        // Combine this with our set of cells
-        return [...slicedUndo, cells];
+        // make a copy of the cells so that further changes don't modify them.
+        const copy = cloneDeep(cells);
+        return [...slicedUndo, copy];
     }
 
     private clearAllSilent = () => {

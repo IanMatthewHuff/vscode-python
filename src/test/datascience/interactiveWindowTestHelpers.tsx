@@ -240,7 +240,7 @@ async function submitInput(wrapper: ReactWrapper<any, Readonly<{}>, React.Compon
     const renderPromise = waitForUpdate(wrapper, InteractivePanel, 6);
 
     // Submit a keypress into the textarea
-    simulateKey(textArea, '\n', true);
+    simulateKey(textArea, 'Enter', true);
 
     return renderPromise;
 }

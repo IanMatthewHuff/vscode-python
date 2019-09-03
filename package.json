@@ -2,8 +2,8 @@
     "name": "python",
     "displayName": "Python",
     "description": "Linting, Debugging (multi-threaded, remote), Intellisense, code formatting, refactoring, unit tests, snippets, and more.",
-    "version": "2019.9.0-dev",
-    "languageServerVersion": "0.3.43",
+    "version": "2019.10.0-dev",
+    "languageServerVersion": "0.3.66",
     "publisher": "ms-python",
     "author": {
         "name": "Microsoft Corporation"
@@ -1764,15 +1764,10 @@
                     "description": "Whether to install Python modules globally when not using an environment.",
                     "scope": "resource"
                 },
-                "python.languageServer": {
-                    "type": "string",
-                    "enum": [
-                        "jedi",
-                        "microsoft",
-                        "none"
-                    ],
-                    "default": "jedi",
-                    "description": "Specifies which language server to use for IntelliSense engine.",
+                "python.jediEnabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enables Jedi as IntelliSense engine instead of Microsoft Python Analysis Engine.",
                     "scope": "resource"
                 },
                 "python.jediMemoryLimit": {
@@ -2036,7 +2031,8 @@
                     "description": "Path to mypy, you can use a custom version of mypy by modifying this setting to include the full path.",
                     "scope": "resource"
                 },
-                "python.linting.pep8Args": {
+
+                "python.linting.pycodestyleArgs": {
                     "type": "array",
                     "description": "Arguments passed in. Each argument is a separate item in the array.",
                     "default": [],
@@ -2045,10 +2041,10 @@
                     },
                     "scope": "resource"
                 },
-                "python.linting.pep8CategorySeverity.E": {
+                "python.linting.pycodestyleCategorySeverity.E": {
                     "type": "string",
                     "default": "Error",
-                    "description": "Severity of Pep8 message type 'E'.",
+                    "description": "Severity of pycodestyle message type 'E'.",
                     "enum": [
                         "Hint",
                         "Error",
@@ -2057,10 +2053,10 @@
                     ],
                     "scope": "resource"
                 },
-                "python.linting.pep8CategorySeverity.W": {
+                "python.linting.pycodestyleCategorySeverity.W": {
                     "type": "string",
                     "default": "Warning",
-                    "description": "Severity of Pep8 message type 'W'.",
+                    "description": "Severity of pycodestyle message type 'W'.",
                     "enum": [
                         "Hint",
                         "Error",
@@ -2069,16 +2065,16 @@
                     ],
                     "scope": "resource"
                 },
-                "python.linting.pep8Enabled": {
+                "python.linting.pycodestyleEnabled": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Whether to lint Python files using pep8",
+                    "description": "Whether to lint Python files using pycodestyle",
                     "scope": "resource"
                 },
-                "python.linting.pep8Path": {
+                "python.linting.pycodestylePath": {
                     "type": "string",
-                    "default": "pep8",
-                    "description": "Path to pep8, you can use a custom version of pep8 by modifying this setting to include the full path.",
+                    "default": "pycodestyle",
+                    "description": "Path to pycodestyle, you can use a custom version of pycodestyle by modifying this setting to include the full path.",
                     "scope": "resource"
                 },
                 "python.linting.prospectorArgs": {
@@ -2437,7 +2433,7 @@
                     "description": "Uncomment shell assignments (#!), line magic (#!%) and cell magic (#!%%) when parsing code cells.",
                     "scope": "resource"
                 },
-                "python.dataScience.runMagicCommands": {
+                "python.dataScience.runStartupCommands": {
                     "type": "string",
                     "default": "",
                     "description": "A series of Python instructions that will be executed when the interactive window loads.",

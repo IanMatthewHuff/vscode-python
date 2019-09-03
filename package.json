@@ -2590,8 +2590,9 @@
         "verifyBundle": "gulp verifyBundle"
     },
     "dependencies": {
+        "@blueprintjs/select": "^3.10.0",
         "@jupyterlab/services": "^3.2.1",
-        "@msrvida/python-program-analysis": "0.0.5",
+        "@msrvida/python-program-analysis": "0.1.5",
         "ansi-regex": "^4.1.0",
         "arch": "^2.1.0",
         "azure-storage": "^2.10.3",

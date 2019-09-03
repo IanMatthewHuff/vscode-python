@@ -1,7 +1,7 @@
 import { DataflowAnalyzer } from '@msrvida/python-program-analysis';
-import { JupyterCell as ICell, LabCell } from '@msrvida/python-program-analysis/lib/cell';
-import { CellSlice } from '@msrvida/python-program-analysis/lib/cellslice';
-import { ExecutionLogSlicer } from '@msrvida/python-program-analysis/lib/log-slicer';
+import { Cell as ICell, LogCell } from '@msrvida/python-program-analysis/dist/es5/cell';
+import { CellSlice } from '@msrvida/python-program-analysis/dist/es5/cellslice';
+import { ExecutionLogSlicer } from '@msrvida/python-program-analysis/dist/es5/log-slicer';
 
 import { inject, injectable } from 'inversify';
 import { IApplicationShell, ICommandManager } from '../../common/application/types';
@@ -57,7 +57,7 @@ export class GatherExecution implements IGatherExecution, INotebookExecutionLogg
                 vscCell.data.source = cellMatcher.stripFirstMarker(concatMultilineString(vscCell.data.source));
 
                 // Convert IVscCell to IGatherCell
-                const cell = convertVscToGatherCell(vscCell) as LabCell;
+                const cell = convertVscToGatherCell(vscCell) as LogCell;
 
                 // Call internal logging method
                 if (!vscCell.data.source.startsWith(internalUseCellKey)) {

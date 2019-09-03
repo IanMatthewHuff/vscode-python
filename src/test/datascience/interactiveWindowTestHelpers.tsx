@@ -10,7 +10,7 @@ import { CancellationToken } from 'vscode';
 
 import { EXTENSION_ROOT_DIR } from '../../client/common/constants';
 import { IDataScienceSettings } from '../../client/common/types';
-//import { InteractiveWindowMessages } from '../../client/datascience/interactive-window/interactiveWindowTypes';
+import { InteractiveWindowMessages } from '../../client/datascience/interactive-common/interactiveWindowTypes';
 import { IInteractiveWindow, IJupyterExecution } from '../../client/datascience/types';
 import { InteractivePanel } from '../../datascience-ui/history-react/interactivePanel';
 import { ImageButton } from '../../datascience-ui/react-common/imageButton';
@@ -122,8 +122,6 @@ export function verifyHtmlOnCell(wrapper: ReactWrapper<any, Readonly<{}>, React.
     // ! is ok here to get rid of undefined type check as we want a fail here if we have not initialized targetCell
     assert.ok(targetCell!, 'Target cell doesn\'t exist');
 
-    targetCell!.instance().forceUpdate();
-
     // If html is specified, check it
     if (html) {
         // Extract only the first 100 chars from the input string
@@ -184,7 +182,7 @@ export async function getCellResults(wrapper: ReactWrapper<any, Readonly<{}>, Re
     return wrapper.find('Cell');
 }
 
-export async function addCode(interactiveWindowProvider: () => Promise<IInteractiveWindow>, wrapper: ReactWrapper<any, Readonly<{}>, React.Component>, code: string, expectedRenderCount: number = 3, expectError: boolean = false): Promise<ReactWrapper<any, Readonly<{}>, React.Component>> {
+export async function addCode(interactiveWindowProvider: () => Promise<IInteractiveWindow>, wrapper: ReactWrapper<any, Readonly<{}>, React.Component>, code: string, expectedRenderCount: number = 4, expectError: boolean = false): Promise<ReactWrapper<any, Readonly<{}>, React.Component>> {
     // Adding code should cause 5 renders to happen.
     // 1) Input
     // 2) Status ready
@@ -239,10 +237,10 @@ function simulateKey(domNode: HTMLTextAreaElement, key: string, shiftDown?: bool
 async function submitInput(wrapper: ReactWrapper<any, Readonly<{}>, React.Component>, textArea: HTMLTextAreaElement): Promise<void> {
     // Get a render promise with the expected number of renders (how many updates a the shift + enter will cause)
     // Should be 6 - 1 for the shift+enter and 5 for the new cell.
-    const renderPromise = waitForUpdate(wrapper, InteractivePanel, 3);
+    const renderPromise = waitForUpdate(wrapper, InteractivePanel, 6);
 
     // Submit a keypress into the textarea
-    simulateKey(textArea, '\n', true);
+    simulateKey(textArea, 'Enter', true);
 
     return renderPromise;
 }
@@ -347,12 +345,11 @@ export function getMainPanel(wrapper: ReactWrapper<any, Readonly<{}>>): Interact
 }
 
 // Update data science settings while running (goes through the UpdateSettings channel)
-export function updateDataScienceSettings(wrapper: ReactWrapper<any, Readonly<{}>>, _newSettings: IDataScienceSettings) {
-    //const settingsString = JSON.stringify(newSettings);
+export function updateDataScienceSettings(wrapper: ReactWrapper<any, Readonly<{}>>, newSettings: IDataScienceSettings) {
+    const settingsString = JSON.stringify(newSettings);
     const mainPanel = getMainPanel(wrapper);
     if (mainPanel) {
-        assert.fail('Fail until figure out how to send messages');
-        //mainPanel.handleMessage(InteractiveWindowMessages.UpdateSettings, settingsString);
+        mainPanel.stateController.handleMessage(InteractiveWindowMessages.UpdateSettings, settingsString);
     }
     wrapper.update();
 }

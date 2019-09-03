@@ -293,9 +293,9 @@ suite('DataScience LiveShare tests', () => {
         fileSystem.setup(f => f.getSubDirectories(TypeMoq.It.isAny())).returns(() => Promise.resolve([]));
 
         // Need to register commands as our extension isn't actually loading.
-        const listener = guestContainer!.get<IDataScienceCommandListener>(IDataScienceCommandListener);
+        const listeners = guestContainer!.getAll<IDataScienceCommandListener>(IDataScienceCommandListener);
         const guestCommandManager = guestContainer!.get<ICommandManager>(ICommandManager);
-        listener.register(guestCommandManager);
+        listeners.forEach(f => f.register(guestCommandManager));
 
         // Start both the host and the guest
         await startSession(vsls.Role.Host);

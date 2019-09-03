@@ -68,6 +68,9 @@ export class NativeEditor extends React.Component<INativeEditorProps, IMainState
     }
 
     public render() {
+        // Update the state controller with our new state
+        this.stateController.renderUpdate(this.state);
+
         return (
             <div id='main-panel' ref={this.mainPanelRef} role='Main'>
                 <div className='styleSetter'>

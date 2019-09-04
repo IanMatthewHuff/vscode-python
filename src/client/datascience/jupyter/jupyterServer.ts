@@ -64,18 +64,7 @@ export class JupyterServerBase implements INotebookServer {
     }
 
     public createNotebook(resource: Uri, cancelToken?: CancellationToken): Promise<INotebook> {
-        return this.createNotebookInstance(resource, this.sessionManager, this.disposableRegistry, this.configService, this.loggers, cancelToken).then(p => {
-            // Rewrite the dispose so we can remove it from our list
-            const oldDispose = p.dispose;
-            p.dispose = () => {
-                this.notebooks.delete(p.resource.toString());
-                return oldDispose();
-            };
-
-            // Save the notebook
-            this.notebooks.set(p.resource.toString(), p);
-            return p;
-        });
+        return this.createNotebookInstance(resource, this.sessionManager, this.disposableRegistry, this.configService, this.loggers, cancelToken);
     }
 
     public async shutdown(): Promise<void> {
@@ -84,7 +73,7 @@ export class JupyterServerBase implements INotebookServer {
             this.connectionInfoDisconnectHandler = undefined;
         }
         traceInfo(`Shutting down ${this.id}`);
-        await Promise.all([...this.notebooks.values()].map(n => n.dispose));
+        await Promise.all([...this.notebooks.values()].map(n => n.dispose()));
     }
 
     public dispose(): Promise<void> {
@@ -124,6 +113,17 @@ export class JupyterServerBase implements INotebookServer {
 
     public async getNotebook(resource: Uri): Promise<INotebook | undefined> {
         return this.notebooks.get(resource.toString());
+    }
+
+    protected setNotebook(resource: Uri, notebook: INotebook) {
+        const oldDispose = notebook.dispose;
+        notebook.dispose = () => {
+            this.notebooks.delete(resource.toString());
+            return oldDispose();
+        };
+
+        // Save the notebook
+        this.notebooks.set(resource.toString(), notebook);
     }
 
     protected createNotebookInstance(

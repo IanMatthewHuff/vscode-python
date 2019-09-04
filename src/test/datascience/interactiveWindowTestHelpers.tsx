@@ -326,7 +326,7 @@ export function defaultDataScienceSettings(): IDataScienceSettings {
         codeRegularExpression: '^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])',
         markdownRegularExpression: '^(#\\s*%%\\s*\\[markdown\\]|#\\s*\\<markdowncell\\>)',
         enablePlotViewer: true,
-        runMagicCommands: '',
+        runStartupCommands: '',
         debugJustMyCode: true
     };
 }

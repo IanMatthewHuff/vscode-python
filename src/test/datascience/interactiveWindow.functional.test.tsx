@@ -7,11 +7,10 @@ import { parse } from 'node-html-parser';
 import * as os from 'os';
 import * as path from 'path';
 import * as TypeMoq from 'typemoq';
-import { Disposable, Selection, TextDocument, TextEditor } from 'vscode';
+import { Disposable, Selection } from 'vscode';
 
 import { IApplicationShell, IDocumentManager } from '../../client/common/application/types';
 import { createDeferred, waitForPromise } from '../../client/common/utils/async';
-import { noop } from '../../client/common/utils/misc';
 import { generateCellsFromDocument } from '../../client/datascience/cellFactory';
 import { concatMultilineString } from '../../client/datascience/common';
 import { EditorContexts } from '../../client/datascience/constants';
@@ -54,19 +53,10 @@ import { waitForUpdate } from './reactHelpers';
 suite('DataScience Interactive Window output tests', () => {
     const disposables: Disposable[] = [];
     let ioc: DataScienceIocContainer;
-    let messageWrapper: ((m: string, payload: any) => void) | undefined;
 
     setup(() => {
         ioc = new DataScienceIocContainer();
         ioc.registerDataScienceTypes();
-
-        // Add a listener for our ioc that lets the test
-        // forward messages on
-        ioc.addMessageListener((m, p) => {
-            if (messageWrapper) {
-                messageWrapper(m, p);
-            }
-        });
     });
 
     teardown(async () => {
@@ -105,17 +95,6 @@ suite('DataScience Interactive Window output tests', () => {
         action();
         await ioc.wrapperCreatedPromise.promise;
         ioc.wrapperCreatedPromise = undefined;
-    }
-
-    function waitForMessage(message: string) : Promise<void> {
-        // Wait for the mounted web panel to send a message back to the data explorer
-        const promise = createDeferred<void>();
-        messageWrapper = (m: string, _p: any) => {
-            if (m === message) {
-                promise.resolve();
-            }
-        };
-        return promise.promise;
     }
 
     runMountedTest('Simple text', async (wrapper) => {

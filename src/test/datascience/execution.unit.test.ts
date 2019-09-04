@@ -593,7 +593,7 @@ suite('Jupyter Execution', async () => {
             markdownRegularExpression: '^(#\\s*%%\\s*\\[markdown\\]|#\\s*\\<markdowncell\\>)',
             allowLiveShare: false,
             enablePlotViewer: true,
-            runMagicCommands: '',
+            runStartupCommands: '',
             debugJustMyCode: true
         };
 

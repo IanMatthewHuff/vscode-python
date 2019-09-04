@@ -196,6 +196,13 @@ export class JupyterNotebookBase implements INotebook {
                 matplobInit,
                 cancelToken
             );
+
+            // Run any startup commands that we specified
+            if (settings.runStartupCommands) {
+                await this.executeSilently(settings.runStartupCommands, cancelToken);
+                traceInfo(`Run startup code for notebook: ${settings.runStartupCommands}`);
+            }
+
             traceInfo(`Initial setup complete for ${this.resource.toString()}`);
         } catch (e) {
             traceWarning(e);

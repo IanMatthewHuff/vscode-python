@@ -32,8 +32,8 @@ export class GatherExecution implements IGatherExecution, INotebookExecutionLogg
     ) {
         this._enabled = this.configService.getSettings().datascience.enableGather ? true : false;
 
-        const rules = this.configService.getSettings().datascience.gatherRules;
-        this.dataflowAnalyzer = new DataflowAnalyzer(rules);
+        //const rules = this.configService.getSettings().datascience.gatherRules;
+        this.dataflowAnalyzer = new DataflowAnalyzer();
         this._executionSlicer = new ExecutionLogSlicer(this.dataflowAnalyzer);
 
         if (this.enabled) {

@@ -14,7 +14,7 @@ import { IAsyncDisposableRegistry, IConfigurationService, IDisposableRegistry } 
 import * as localize from '../../../common/utils/localize';
 import { StopWatch } from '../../../common/utils/stopWatch';
 import { sendTelemetryEvent } from '../../../telemetry';
-import { LiveShare, LiveShareCommands, RegExpValues, Telemetry } from '../../constants';
+import { Identifiers, LiveShare, LiveShareCommands, RegExpValues, Telemetry } from '../../constants';
 import {
     IDataScience,
     IJupyterSessionManager,
@@ -80,10 +80,12 @@ export class HostJupyterServer
                 service.onRequest(LiveShareCommands.syncRequest, (_args: any[], _cancellation: CancellationToken) => this.onSync());
                 service.onRequest(LiveShareCommands.disposeServer, (_args: any[], _cancellation: CancellationToken) => this.dispose());
                 service.onRequest(LiveShareCommands.createNotebook, async (args: any[], cancellation: CancellationToken) => {
-                    // Translate the uri into local
-                    const resource = this.finishedApi!.convertSharedUriToLocal(args[0]);
+                    // Translate the uri into local if possible
+                    const uri = args[0] as vscode.Uri;
+                    const resource = (uri.scheme && uri.scheme !== Identifiers.InteractiveWindowIdentityScheme) ? this.finishedApi!.convertSharedUriToLocal(args[0]) : uri;
                     // Don't return the notebook. We don't want it to be serialized. We just want its live share server to be started.
-                    await this.createNotebook(resource, cancellation);
+                    const notebook = await this.createNotebook(resource, cancellation) as HostJupyterNotebook;
+                    await notebook.onAttach(api);
                 });
 
                 // See if we need to forward the port
@@ -166,6 +168,10 @@ export class HostJupyterServer
 
             traceInfo(`Finished connecting ${this.id}`);
 
+            // Save the notebook
+            this.setNotebook(resource, notebook);
+
+            // Return the result.
             return notebook;
         }
 

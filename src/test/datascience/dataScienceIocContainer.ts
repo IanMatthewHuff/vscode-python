@@ -673,6 +673,10 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
         return this.serviceManager.get<T>(serviceIdentifier, name);
     }
 
+    public getAll<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>, name?: string | number | symbol): T[] {
+        return this.serviceManager.getAll<T>(serviceIdentifier, name);
+    }
+
     public addDocument(code: string, file: string) {
         this.documentManager.addDocument(code, file);
     }

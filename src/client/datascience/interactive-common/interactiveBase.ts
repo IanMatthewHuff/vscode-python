@@ -224,7 +224,9 @@ export abstract class InteractiveBase extends WebViewHost<IInteractiveWindowMapp
                 break;
 
             case InteractiveWindowMessages.VariableExplorerToggle:
-                this.variableExplorerToggle(payload);
+                if (this.variableExplorerToggle) {
+                    this.variableExplorerToggle(payload);
+                }
                 break;
 
             case InteractiveWindowMessages.AddedSysInfo:

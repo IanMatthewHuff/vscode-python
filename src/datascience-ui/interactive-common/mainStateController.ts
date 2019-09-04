@@ -74,6 +74,7 @@ export class MainStateController implements IMessageHandler {
             pendingVariableCount: 0,
             debugging: false,
             knownDark: false,
+            variablesVisible: false,
             editCellVM: this.props.hasEdit ? createEditableCellVM(1) : undefined,
             enableGather: this.props.enableGather
         };
@@ -409,6 +410,7 @@ export class MainStateController implements IMessageHandler {
     }
 
     public variableExplorerToggled = (open: boolean) => {
+        this.setState({ variablesVisible: open });
         this.sendMessage(InteractiveWindowMessages.VariableExplorerToggle, open);
     }
 
@@ -917,10 +919,10 @@ export class MainStateController implements IMessageHandler {
             const newExecutionCount = cell.data.execution_count ?
                 Math.max(this.state.currentExecutionCount, parseInt(cell.data.execution_count.toString(), 10)) :
                 this.state.currentExecutionCount;
-            if (newExecutionCount !== this.state.currentExecutionCount && !this.props.testMode) {
+            if (newExecutionCount !== this.state.currentExecutionCount && this.state.variablesVisible) {
                 // We also need to update our variable explorer when the execution count changes
                 // Use the ref here to maintain var explorer independence
-                this.refreshVariables();
+                this.refreshVariables(newExecutionCount);
             }
 
             // Have to make a copy of the cell VM array or

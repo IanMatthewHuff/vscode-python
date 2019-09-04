@@ -14,7 +14,7 @@ import { IAsyncDisposableRegistry, IConfigurationService, IDisposableRegistry } 
 import * as localize from '../../../common/utils/localize';
 import { StopWatch } from '../../../common/utils/stopWatch';
 import { sendTelemetryEvent } from '../../../telemetry';
-import { LiveShare, LiveShareCommands, RegExpValues, Telemetry, Identifiers } from '../../constants';
+import { Identifiers, LiveShare, LiveShareCommands, RegExpValues, Telemetry } from '../../constants';
 import {
     IDataScience,
     IJupyterSessionManager,
@@ -168,6 +168,10 @@ export class HostJupyterServer
 
             traceInfo(`Finished connecting ${this.id}`);
 
+            // Save the notebook
+            this.setNotebook(resource, notebook);
+
+            // Return the result.
             return notebook;
         }
 

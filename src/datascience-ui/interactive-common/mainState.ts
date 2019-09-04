@@ -32,6 +32,7 @@ export interface IMainState {
     knownDark: boolean;
     editorOptions?: monacoEditor.editor.IEditorOptions;
     currentExecutionCount: number;
+    variablesVisible: boolean;
     variables: IJupyterVariable[];
     pendingVariableCount: number;
     debugging: boolean;
@@ -70,6 +71,7 @@ export function generateTestState(inputBlockToggled: (id: string) => void, fileP
         editorOptions: {},
         currentExecutionCount: 0,
         knownDark: false,
+        variablesVisible: false,
         variables: [
             {
                 name: 'foo',

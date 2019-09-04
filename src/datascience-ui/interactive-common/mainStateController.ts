@@ -74,6 +74,7 @@ export class MainStateController implements IMessageHandler {
             pendingVariableCount: 0,
             debugging: false,
             knownDark: false,
+            variablesVisible: false,
             editCellVM: this.props.hasEdit ? createEditableCellVM(1) : undefined,
             enableGather: this.props.enableGather
         };
@@ -409,6 +410,7 @@ export class MainStateController implements IMessageHandler {
     }
 
     public variableExplorerToggled = (open: boolean) => {
+        this.setState({ variablesVisible: open });
         this.sendMessage(InteractiveWindowMessages.VariableExplorerToggle, open);
     }
 
@@ -616,6 +618,16 @@ export class MainStateController implements IMessageHandler {
         }
     }
 
+    public renderUpdate(newState: {}) {
+        // This method should be called during the render stage of anything
+        // using this state Controller. That's because after shouldComponentUpdate
+        // render is next and at this point the state has been set.
+        // See https://reactjs.org/docs/react-component.html
+        // Otherwise we set the state in the callback during setState and this can be
+        // too late for any render code to use the stateController.
+        this.state = { ...this.state, ...newState };
+    }
+
     public getState(): IMainState {
         return this.state;
     }
@@ -695,7 +707,7 @@ export class MainStateController implements IMessageHandler {
             cellVM = this.alterCellVM(cellVM, showInputs, !collapseInputs);
 
             if (cellVM) {
-                const newList = this.state.cellVMs;
+                const newList = [...this.state.cellVMs];
                 // Make sure to use the same array so our entire state doesn't update
                 if (position && position >= 0) {
                     newList.splice(position, 0, cellVM);
@@ -819,8 +831,9 @@ export class MainStateController implements IMessageHandler {
         // Get the undo stack up to the maximum length
         const slicedUndo = stack.slice(0, min([stack.length, this.stackLimit]));
 
-        // Combine this with our set of cells
-        return [...slicedUndo, cells];
+        // make a copy of the cells so that further changes don't modify them.
+        const copy = cloneDeep(cells);
+        return [...slicedUndo, copy];
     }
 
     private clearAllSilent = () => {
@@ -906,16 +919,17 @@ export class MainStateController implements IMessageHandler {
             const newExecutionCount = cell.data.execution_count ?
                 Math.max(this.state.currentExecutionCount, parseInt(cell.data.execution_count.toString(), 10)) :
                 this.state.currentExecutionCount;
-            if (newExecutionCount !== this.state.currentExecutionCount && !this.props.testMode) {
+            if (newExecutionCount !== this.state.currentExecutionCount && this.state.variablesVisible) {
                 // We also need to update our variable explorer when the execution count changes
                 // Use the ref here to maintain var explorer independence
-                this.refreshVariables();
+                this.refreshVariables(newExecutionCount);
             }
 
             // Have to make a copy of the cell VM array or
             // we won't actually update.
             const newVMs = [...this.state.cellVMs];
-            newVMs[index].cell = cloneDeep(cell);
+            newVMs[index] = cloneDeep(newVMs[index]);
+            newVMs[index].cell = cell;
             this.setState({
                 cellVMs: newVMs,
                 currentExecutionCount: newExecutionCount

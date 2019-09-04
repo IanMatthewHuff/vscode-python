@@ -84,7 +84,7 @@ export enum Product {
     nosetest = 2,
     pylint = 3,
     flake8 = 4,
-    pycodestyle = 5,
+    pep8 = 5,
     pylama = 6,
     prospector = 7,
     pydocstyle = 8,
@@ -145,6 +145,7 @@ export interface ICurrentProcess {
     on(event: string | symbol, listener: Function): this;
 }
 
+export type LanguageServerType = 'jedi' | 'microsoft' | 'none';
 export interface IPythonSettings {
     readonly pythonPath: string;
     readonly venvPath: string;
@@ -154,7 +155,7 @@ export interface IPythonSettings {
     readonly poetryPath: string;
     readonly insidersChannel: ExtensionChannels;
     readonly downloadLanguageServer: boolean;
-    readonly jediEnabled: boolean;
+    readonly languageServer: LanguageServerType;
     readonly jediPath: string;
     readonly jediMemoryLimit: number;
     readonly devOptions: string[];
@@ -199,7 +200,7 @@ export interface IPylintCategorySeverity {
     readonly error: DiagnosticSeverity;
     readonly fatal: DiagnosticSeverity;
 }
-export interface IPycodestyleCategorySeverity {
+export interface IPep8CategorySeverity {
     readonly W: DiagnosticSeverity;
     readonly E: DiagnosticSeverity;
 }
@@ -220,8 +221,8 @@ export interface ILintingSettings {
     readonly prospectorArgs: string[];
     readonly pylintEnabled: boolean;
     readonly pylintArgs: string[];
-    readonly pycodestyleEnabled: boolean;
-    readonly pycodestyleArgs: string[];
+    readonly pep8Enabled: boolean;
+    readonly pep8Args: string[];
     readonly pylamaEnabled: boolean;
     readonly pylamaArgs: string[];
     readonly flake8Enabled: boolean;
@@ -231,12 +232,12 @@ export interface ILintingSettings {
     readonly lintOnSave: boolean;
     readonly maxNumberOfProblems: number;
     readonly pylintCategorySeverity: IPylintCategorySeverity;
-    readonly pycodestyleCategorySeverity: IPycodestyleCategorySeverity;
+    readonly pep8CategorySeverity: IPep8CategorySeverity;
     readonly flake8CategorySeverity: Flake8CategorySeverity;
     readonly mypyCategorySeverity: IMypyCategorySeverity;
     prospectorPath: string;
     pylintPath: string;
-    pycodestylePath: string;
+    pep8Path: string;
     pylamaPath: string;
     flake8Path: string;
     pydocstylePath: string;

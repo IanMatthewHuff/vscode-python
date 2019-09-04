@@ -86,7 +86,8 @@ import {
     ILogger,
     IPathUtils,
     IPersistentStateFactory,
-    IsWindows
+    IsWindows,
+    LanguageServerType
 } from '../../client/common/types';
 import { Deferred, sleep } from '../../client/common/utils/async';
 import { noop } from '../../client/common/utils/misc';
@@ -672,6 +673,10 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
         return this.serviceManager.get<T>(serviceIdentifier, name);
     }
 
+    public getAll<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>, name?: string | number | symbol): T[] {
+        return this.serviceManager.getAll<T>(serviceIdentifier, name);
+    }
+
     public addDocument(code: string, file: string) {
         this.documentManager.addDocument(code, file);
     }
@@ -680,8 +685,8 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
         this.extraListeners.push(callback);
     }
 
-    public changeJediEnabled(enabled: boolean) {
-        this.pythonSettings.jediEnabled = enabled;
+    public changeLanguageServer(languageServerValue: LanguageServerType) {
+        this.pythonSettings.languageServer = languageServerValue;
     }
 
     private findPythonPath(): string {

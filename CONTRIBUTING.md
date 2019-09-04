@@ -36,7 +36,7 @@ cd vscode-python
 npm ci
 python3 -m venv .venv
 # Activate the virtual environment as appropriate for your shell.
-npx gulp installPythonLibs
+python3 -m pip --disable-pip-version-check install -t ./pythonFiles/lib/python --no-cache-dir --implementation py --no-deps --upgrade -r requirements.txt
 # Optionally Update `launch.json` to set a value for the environment variable `CI_PYTHON_PATH` pointing to the fully qualified path of the above interpreter.
 ```
 You may see warnings that ```The engine "vscode" appears to be invalid.```, you can ignore these.

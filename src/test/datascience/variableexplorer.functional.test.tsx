@@ -7,7 +7,10 @@ import { ReactWrapper } from 'enzyme';
 import { parse } from 'node-html-parser';
 import * as React from 'react';
 import { Disposable } from 'vscode';
-import { InteractiveWindowMessageListener } from '../../client/datascience/interactive-common/interactiveWindowMessageListener';
+
+import {
+    InteractiveWindowMessageListener
+} from '../../client/datascience/interactive-common/interactiveWindowMessageListener';
 import { InteractiveWindowMessages } from '../../client/datascience/interactive-common/interactiveWindowTypes';
 import { IInteractiveWindow, IInteractiveWindowProvider, IJupyterVariable } from '../../client/datascience/types';
 import { VariableExplorer } from '../../datascience-ui/interactive-common/variableExplorer';
@@ -283,6 +286,7 @@ function openVariableExplorer(wrapper: ReactWrapper<any, Readonly<{}>, React.Com
 
     if (varExp) {
         varExp.setState({open: true});
+        varExp.props.variableExplorerToggled(true);
     }
 }
 

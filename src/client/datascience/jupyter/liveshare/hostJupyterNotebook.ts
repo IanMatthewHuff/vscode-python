@@ -55,7 +55,7 @@ export class HostJupyterNotebook
         super(liveShare, session, configService, disposableRegistry, owner, launchInfo, loggers, resource, getDisposedError);
     }
 
-    public async dispose(): Promise<void> {
+    public dispose = async (): Promise<void> => {
         if (!this.disposed) {
             this.disposed = true;
             await super.dispose();

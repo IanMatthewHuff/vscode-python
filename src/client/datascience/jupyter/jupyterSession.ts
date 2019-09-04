@@ -46,6 +46,7 @@ export class JupyterSession implements IJupyterSession {
     private statusHandler: Slot<Session.ISession, Kernel.Status> | undefined;
     private connected: boolean = false;
     private jupyterPasswordConnect: IJupyterPasswordConnect;
+    private oldSessions: Session.ISession[] = [];
 
     constructor(
         connInfo: IConnection,
@@ -123,8 +124,8 @@ export class JupyterSession implements IJupyterSession {
             if (oldStatusHandler) {
                 oldSession.statusChanged.disconnect(oldStatusHandler);
             }
-
-            this.shutdownSession(oldSession, undefined).ignoreErrors();
+            // Don't shutdown old sessions yet. This seems to hang tests.
+            this.oldSessions.push(oldSession);
         } else {
             throw new Error(localize.DataScience.sessionDisposed());
         }
@@ -206,7 +207,8 @@ export class JupyterSession implements IJupyterSession {
                 traceInfo(`Error waiting for restart session: ${exc}`);
                 tryCount += 1;
                 if (result) {
-                    this.shutdownSession(result, undefined).ignoreErrors();
+                    // Cleanup later.
+                    this.oldSessions.push(result);
                 }
                 result = undefined;
                 exception = exc;
@@ -373,6 +375,8 @@ export class JupyterSession implements IJupyterSession {
         }
         if (this.session || this.sessionManager) {
             try {
+                traceInfo('ShutdownSessionAndConnection - old sessions');
+                await Promise.all(this.oldSessions.map(s => this.shutdownSession(s, undefined)));
                 traceInfo('ShutdownSessionAndConnection - current session');
                 await this.shutdownSession(this.session, this.statusHandler);
                 traceInfo('ShutdownSessionAndConnection - get restart session');

@@ -30,6 +30,7 @@ import {
     IJupyterExecution,
     IJupyterKernelSpec,
     IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     INotebookServer,
     INotebookServerLaunchInfo,
     INotebookServerOptions
@@ -64,7 +65,7 @@ export class JupyterExecutionBase implements IJupyterExecution {
         private disposableRegistry: IDisposableRegistry,
         private asyncRegistry: IAsyncDisposableRegistry,
         private fileSystem: IFileSystem,
-        private sessionManager: IJupyterSessionManager,
+        private sessionManagerFactory: IJupyterSessionManagerFactory,
         workspace: IWorkspaceService,
         private configuration: IConfigurationService,
         private commandFactory: IJupyterCommandFactory,
@@ -236,10 +237,10 @@ export class JupyterExecutionBase implements IJupyterExecution {
     }
 
     @captureTelemetry(Telemetry.FindJupyterKernelSpec)
-    protected async getMatchingKernelSpec(connection?: IConnection, cancelToken?: CancellationToken): Promise<IJupyterKernelSpec | undefined> {
+    protected async getMatchingKernelSpec(sessionManager: IJupyterSessionManager | undefined, cancelToken?: CancellationToken): Promise<IJupyterKernelSpec | undefined> {
         try {
             // If not using an active connection, check on disk
-            if (!connection) {
+            if (!sessionManager) {
                 // Get our best interpreter. We want its python path
                 const bestInterpreter = await this.getUsableJupyterPython(cancelToken);
 
@@ -255,7 +256,7 @@ export class JupyterExecutionBase implements IJupyterExecution {
             }
 
             // Now enumerate them again
-            const enumerator = connection ? () => this.sessionManager.getActiveKernelSpecs(connection) : () => this.enumerateSpecs(cancelToken);
+            const enumerator = sessionManager ? () => sessionManager.getActiveKernelSpecs() : () => this.enumerateSpecs(cancelToken);
 
             // Then find our match
             return this.findSpecMatch(enumerator);
@@ -264,8 +265,8 @@ export class JupyterExecutionBase implements IJupyterExecution {
             this.logger.logWarning(e);
 
             // Double check our jupyter server is still running.
-            if (connection && connection.localProcExitCode) {
-                throw new Error(localize.DataScience.jupyterServerCrashed().format(connection.localProcExitCode.toString()));
+            if (sessionManager && sessionManager.getConnInfo().localProcExitCode) {
+                throw new Error(localize.DataScience.jupyterServerCrashed().format(sessionManager!.getConnInfo().localProcExitCode!.toString()));
             }
         }
     }
@@ -297,7 +298,9 @@ export class JupyterExecutionBase implements IJupyterExecution {
         // If we don't have a kernel spec yet, check using our current connection
         if (!kernelSpec && connection.localLaunch) {
             traceInfo(`Getting kernel specs for ${options ? options.purpose : 'unknown type of'} server`);
-            kernelSpec = await this.getMatchingKernelSpec(connection, cancelToken);
+            const sessionManager = await this.sessionManagerFactory.create(connection);
+            kernelSpec = await this.getMatchingKernelSpec(sessionManager, cancelToken);
+            await sessionManager.dispose();
         }
 
         // If still not found, log an error (this seems possible for some people, so use the default)

@@ -18,6 +18,7 @@ import { Identifiers, LiveShare, LiveShareCommands, RegExpValues, Telemetry } fr
 import {
     IDataScience,
     IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     INotebook,
     INotebookExecutionLogger,
     INotebookServer,
@@ -43,7 +44,7 @@ export class HostJupyterServer
         asyncRegistry: IAsyncDisposableRegistry,
         disposableRegistry: IDisposableRegistry,
         configService: IConfigurationService,
-        sessionManager: IJupyterSessionManager,
+        sessionManager: IJupyterSessionManagerFactory,
         loggers: INotebookExecutionLogger[]) {
         super(liveShare, asyncRegistry, disposableRegistry, configService, sessionManager, loggers);
     }
@@ -140,7 +141,7 @@ export class HostJupyterServer
         }
 
         // Start a session
-        const session = await sessionManager.startNew(launchInfo.connectionInfo, launchInfo.kernelSpec, cancelToken);
+        const session = await sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
         traceInfo(`Started session ${this.id}`);
 
         if (session) {

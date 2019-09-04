@@ -56,7 +56,7 @@ import { ServiceManager } from '../../client/ioc/serviceManager';
 import { getOSType, OSType } from '../common';
 import { noop } from '../core';
 import { MockAutoSelectionService } from '../mocks/autoSelector';
-import { MockJupyterManager } from './mockJupyterManager';
+import { MockJupyterManagerFactory } from './mockJupyterManagerFactory';
 
 class MockJupyterNotebook implements INotebook {
 
@@ -616,7 +616,7 @@ suite('Jupyter Execution', async () => {
 
         const serviceManager = mock(ServiceManager);
 
-        const mockSessionManager = new MockJupyterManager(instance(serviceManager));
+        const mockSessionManager = new MockJupyterManagerFactory(instance(serviceManager));
 
         return new JupyterExecutionFactory(
             instance(liveShare),

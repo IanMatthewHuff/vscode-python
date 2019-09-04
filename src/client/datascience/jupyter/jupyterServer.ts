@@ -15,7 +15,9 @@ import * as localize from '../../common/utils/localize';
 import { noop } from '../../common/utils/misc';
 import {
     IConnection,
+    IJupyterSession,
     IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     INotebook,
     INotebookExecutionLogger,
     INotebookServer,
@@ -32,19 +34,20 @@ export class JupyterServerBase implements INotebookServer {
     private connectionInfoDisconnectHandler: Disposable | undefined;
     private serverExitCode: number | undefined;
     private notebooks: Map<string, INotebook> = new Map<string, INotebook>();
+    private sessionManager: IJupyterSessionManager | undefined;
 
     constructor(
         _liveShare: ILiveShareApi,
         private asyncRegistry: IAsyncDisposableRegistry,
         private disposableRegistry: IDisposableRegistry,
         private configService: IConfigurationService,
-        private sessionManager: IJupyterSessionManager,
+        private sessionManagerFactory: IJupyterSessionManagerFactory,
         private loggers: INotebookExecutionLogger[]
     ) {
         this.asyncRegistry.push(this);
     }
 
-    public async connect(launchInfo: INotebookServerLaunchInfo, _cancelToken?: CancellationToken): Promise<void> {
+    public async connect(launchInfo: INotebookServerLaunchInfo, cancelToken?: CancellationToken): Promise<void> {
         traceInfo(`Connecting server ${this.id} kernelSpec ${launchInfo.kernelSpec ? launchInfo.kernelSpec.name : 'unknown'}`);
 
         // Save our launch info
@@ -61,19 +64,62 @@ export class JupyterServerBase implements INotebookServer {
                 this.shutdown().ignoreErrors();
             });
         }
+
+        // Create our session manager
+        this.sessionManager = await this.sessionManagerFactory.create(launchInfo.connectionInfo);
+
+        // Try creating a session just to ensure we're connected. Callers of this function check to make sure jupyter
+        // is running and connectable.
+        let session: IJupyterSession | undefined;
+        try {
+            session = await this.sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
+            const idleTimeout = this.configService.getSettings().datascience.jupyterLaunchTimeout;
+            // The wait for idle should throw if we can't connect.
+            await session.waitForIdle(idleTimeout);
+        } finally {
+            if (session) {
+                await session.dispose();
+            }
+        }
     }
 
     public createNotebook(resource: Uri, cancelToken?: CancellationToken): Promise<INotebook> {
+        if (!this.sessionManager) {
+            throw new Error(localize.DataScience.sessionDisposed());
+        }
+
         return this.createNotebookInstance(resource, this.sessionManager, this.disposableRegistry, this.configService, this.loggers, cancelToken);
     }
 
     public async shutdown(): Promise<void> {
+        // Order should be
+        // 1) connectionInfoDisconnectHandler - listens to process close
+        // 2) sessions (owned by the notebooks)
+        // 3) session manager (owned by this object)
+        // 4) connInfo (owned by this object) - kills the jupyter process
+
         if (this.connectionInfoDisconnectHandler) {
             this.connectionInfoDisconnectHandler.dispose();
             this.connectionInfoDisconnectHandler = undefined;
         }
-        traceInfo(`Shutting down ${this.id}`);
+
+        // Destroy the kernel spec
+        await this.destroyKernelSpec();
+
+        traceInfo(`Shutting down notebooks for ${this.id}`);
         await Promise.all([...this.notebooks.values()].map(n => n.dispose()));
+        traceInfo(`Shut down session manager`);
+        if (this.sessionManager) {
+            await this.sessionManager.dispose();
+            this.sessionManager = undefined;
+        }
+
+        // After shutting down notebooks and session manager, kill the main process.
+        if (this.launchInfo && this.launchInfo.connectionInfo) {
+            traceInfo('Shutdown server - dispose conn info');
+            this.launchInfo.connectionInfo.dispose(); // This should kill the process that's running
+            this.launchInfo = undefined;
+        }
     }
 
     public dispose(): Promise<void> {
@@ -134,5 +180,18 @@ export class JupyterServerBase implements INotebookServer {
         _loggers: INotebookExecutionLogger[],
         _cancelToken?: CancellationToken): Promise<INotebook> {
         throw new Error('You forgot to override createNotebookInstance');
+    }
+
+    private async destroyKernelSpec() {
+        try {
+            if (this.launchInfo && this.launchInfo.kernelSpec) {
+                await this.launchInfo.kernelSpec.dispose(); // This should delete any old kernel specs
+            }
+        } catch {
+            noop();
+        }
+        if (this.launchInfo) {
+            this.launchInfo.kernelSpec = undefined;
+        }
     }
 }

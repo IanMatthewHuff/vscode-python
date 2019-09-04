@@ -14,7 +14,7 @@ import { LiveShare, LiveShareCommands } from '../../constants';
 import {
     IConnection,
     IDataScience,
-    IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     INotebook,
     INotebookExecutionLogger,
     INotebookServer,
@@ -37,7 +37,7 @@ export class GuestJupyterServer
         _asyncRegistry: IAsyncDisposableRegistry,
         private disposableRegistry: IDisposableRegistry,
         private configService: IConfigurationService,
-        _sessionManager: IJupyterSessionManager,
+        _sessionManager: IJupyterSessionManagerFactory,
         _loggers: INotebookExecutionLogger[]
     ) {
         super(liveShare);

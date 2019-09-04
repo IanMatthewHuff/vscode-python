@@ -14,7 +14,7 @@ import { IAsyncDisposableRegistry, IConfigurationService, IDisposableRegistry } 
 import {
     IConnection,
     IDataScience,
-    IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     INotebook,
     INotebookExecutionLogger,
     INotebookServer,
@@ -26,7 +26,6 @@ import { IRoleBasedObject, RoleBasedFactory } from './liveshare/roleBasedFactory
 import { ILiveShareHasRole } from './liveshare/types';
 
 interface IJupyterServerInterface extends IRoleBasedObject, INotebookServer {
-
 }
 
 // tslint:disable:callable-types
@@ -36,7 +35,7 @@ type JupyterServerClassType = {
         asyncRegistry: IAsyncDisposableRegistry,
         disposableRegistry: IDisposableRegistry,
         configService: IConfigurationService,
-        sessionManager: IJupyterSessionManager,
+        sessionManager: IJupyterSessionManagerFactory,
         loggers: INotebookExecutionLogger[]
     ): IJupyterServerInterface;
 };
@@ -55,7 +54,7 @@ export class JupyterServerFactory implements INotebookServer, ILiveShareHasRole 
         @inject(IDisposableRegistry) disposableRegistry: IDisposableRegistry,
         @inject(IAsyncDisposableRegistry) asyncRegistry: IAsyncDisposableRegistry,
         @inject(IConfigurationService) configService: IConfigurationService,
-        @inject(IJupyterSessionManager) sessionManager: IJupyterSessionManager,
+        @inject(IJupyterSessionManagerFactory) sessionManager: IJupyterSessionManagerFactory,
         @multiInject(INotebookExecutionLogger) @optional() loggers: INotebookExecutionLogger[] | undefined) {
         this.serverFactory = new RoleBasedFactory<IJupyterServerInterface, JupyterServerClassType>(
             liveShare,

@@ -152,10 +152,16 @@ export interface IJupyterSession extends IAsyncDisposable {
     requestExecute(content: KernelMessage.IExecuteRequest, disposeOnDone?: boolean, metadata?: JSONObject): Kernel.IFuture | undefined;
     requestComplete(content: KernelMessage.ICompleteRequest): Promise<KernelMessage.ICompleteReplyMsg | undefined>;
 }
-export const IJupyterSessionManager = Symbol('IJupyterSessionManager');
-export interface IJupyterSessionManager {
-    startNew(connInfo: IConnection, kernelSpec: IJupyterKernelSpec | undefined, cancelToken?: CancellationToken): Promise<IJupyterSession>;
-    getActiveKernelSpecs(connInfo: IConnection): Promise<IJupyterKernelSpec[]>;
+
+export const IJupyterSessionManagerFactory = Symbol('IJupyterSessionManagerFactory');
+export interface IJupyterSessionManagerFactory {
+    create(connInfo: IConnection): Promise<IJupyterSessionManager>;
+}
+
+export interface IJupyterSessionManager extends IAsyncDisposable {
+    startNew(kernelSpec: IJupyterKernelSpec | undefined, cancelToken?: CancellationToken): Promise<IJupyterSession>;
+    getActiveKernelSpecs(): Promise<IJupyterKernelSpec[]>;
+    getConnInfo(): IConnection;
 }
 
 export interface IJupyterKernelSpec extends IAsyncDisposable {

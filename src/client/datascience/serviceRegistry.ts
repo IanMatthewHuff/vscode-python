@@ -39,7 +39,7 @@ import { JupyterExporter } from './jupyter/jupyterExporter';
 import { JupyterImporter } from './jupyter/jupyterImporter';
 import { JupyterPasswordConnect } from './jupyter/jupyterPasswordConnect';
 import { JupyterServerFactory } from './jupyter/jupyterServerFactory';
-import { JupyterSessionManager } from './jupyter/jupyterSessionManager';
+import { JupyterSessionManagerFactory } from './jupyter/jupyterSessionManagerFactory';
 import { JupyterVariables } from './jupyter/jupyterVariables';
 import { PlotViewer } from './plotting/plotViewer';
 import { PlotViewerProvider } from './plotting/plotViewerProvider';
@@ -67,7 +67,7 @@ import {
     IJupyterDebugger,
     IJupyterExecution,
     IJupyterPasswordConnect,
-    IJupyterSessionManager,
+    IJupyterSessionManagerFactory,
     IJupyterVariables,
     INotebookEditor,
     INotebookEditorProvider,
@@ -111,7 +111,7 @@ export function registerTypes(serviceManager: IServiceManager) {
     serviceManager.addSingleton<ICodeCssGenerator>(ICodeCssGenerator, wrapType(CodeCssGenerator));
     serviceManager.addSingleton<IJupyterPasswordConnect>(IJupyterPasswordConnect, wrapType(JupyterPasswordConnect));
     serviceManager.addSingleton<IStatusProvider>(IStatusProvider, wrapType(StatusProvider));
-    serviceManager.addSingleton<IJupyterSessionManager>(IJupyterSessionManager, wrapType(JupyterSessionManager));
+    serviceManager.addSingleton<IJupyterSessionManagerFactory>(IJupyterSessionManagerFactory, wrapType(JupyterSessionManagerFactory));
     serviceManager.addSingleton<IJupyterVariables>(IJupyterVariables, wrapType(JupyterVariables));
     serviceManager.add<ICodeWatcher>(ICodeWatcher, wrapType(CodeWatcher));
     serviceManager.add<IJupyterCommandFactory>(IJupyterCommandFactory, wrapType(JupyterCommandFactory));

@@ -4,7 +4,6 @@
 import { JSONObject } from '@phosphor/coreutils/lib/json';
 import { assert } from 'chai';
 import * as fs from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
 import { Observable } from 'rxjs/Observable';
 import { SemVer } from 'semver';
@@ -265,7 +264,7 @@ suite('Jupyter Execution', async () => {
     });
 
     setup(() => {
-        workingKernelSpec = createTempSpec(workingPython.path);
+        workingKernelSpec = 'C:\\TempSpec\\kernel.json';
         ipykernelInstallCount = 0;
         // tslint:disable-next-line:no-invalid-this
     });
@@ -291,26 +290,6 @@ suite('Jupyter Execution', async () => {
         public toString(): string {
             return 'FunctionMatcher';
         }
-    }
-
-    function createTempSpec(pythonPath: string): string {
-        const tempDir = os.tmpdir();
-        const subDir = uuid();
-        const filePath = path.join(tempDir, subDir, 'kernel.json');
-        fs.ensureDirSync(path.dirname(filePath));
-        fs.writeJSONSync(filePath,
-            {
-                display_name: 'Python 3',
-                language: 'python',
-                argv: [
-                    pythonPath,
-                    '-m',
-                    'ipykernel_launcher',
-                    '-f',
-                    '{connection_file}'
-                ]
-            });
-        return filePath;
     }
 
     function argThat(func: (obj: any) => boolean): any {
@@ -593,7 +572,7 @@ suite('Jupyter Execution', async () => {
             markdownRegularExpression: '^(#\\s*%%\\s*\\[markdown\\]|#\\s*\\<markdowncell\\>)',
             allowLiveShare: false,
             enablePlotViewer: true,
-            runMagicCommands: '',
+            runStartupCommands: '',
             debugJustMyCode: true
         };
 
@@ -613,6 +592,8 @@ suite('Jupyter Execution', async () => {
         when(fileSystem.createTemporaryFile(anything())).thenResolve(tempFile);
         when(fileSystem.createDirectory(anything())).thenResolve();
         when(fileSystem.deleteDirectory(anything())).thenResolve();
+        when(fileSystem.fileExists(workingKernelSpec)).thenResolve(true);
+        when(fileSystem.readFile(workingKernelSpec)).thenResolve('{"display_name":"Python 3","language":"python","argv":["/foo/bar/python.exe","-m","ipykernel_launcher","-f","{connection_file}"]}');
 
         const serviceManager = mock(ServiceManager);
 

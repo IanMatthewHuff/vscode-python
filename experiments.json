@@ -64,5 +64,29 @@
         "salt": "PtvsdWheels",
         "min": 100,
         "max": 0
+    },
+    {
+        "name": "LS - control",
+        "salt": "LS",
+        "min": 19,
+        "max": 20
+    },
+    {
+        "name": "LS - enabled",
+        "salt": "LS",
+        "min": 10,
+        "max": 11
+    },
+    {
+        "name": "AA_testing - control",
+        "salt": "AA_testing",
+        "min": 0,
+        "max": 10
+    },
+    {
+        "name": "AA_testing - experiment",
+        "salt": "AA_testing",
+        "min": 90,
+        "max": 100
     }
 ]

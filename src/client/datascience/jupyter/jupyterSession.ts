@@ -184,6 +184,7 @@ export class JupyterSession implements IJupyterSession {
             const deferred = createDeferred<boolean>();
             const handler = (_s: Session.ISession, a: Kernel.Status) => {
                 if (a === 'idle') {
+                    traceInfo(`Completed waiting for idle on: ${session.kernel.id}${session.kernel.status}`);
                     deferred.resolve(true);
                 }
             };
@@ -193,6 +194,7 @@ export class JupyterSession implements IJupyterSession {
 
             // If that didn't work throw an exception
             if (!result || !session || !session.kernel) {
+                traceInfo(`Failed waiting for idle on: ${session.kernel.id}${session.kernel.status}`);
                 throw new JupyterWaitForIdleError(localize.DataScience.jupyterLaunchTimedOut());
             }
         }

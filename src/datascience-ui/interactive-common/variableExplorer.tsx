@@ -61,12 +61,10 @@ interface IGridRow {
     buttons: IButtonCellValue;
 }
 
+// tslint:disable:no-any
 export class VariableExplorer extends React.Component<IVariableExplorerProps, IVariableExplorerState> {
     private divRef: React.RefObject<HTMLDivElement>;
-    private generateRows = memoize((variables: IJupyterVariable[], sortColumn: string | number, sortDirection: string): IGridRow[] => {
-        const rows = !this.props.skipDefault ? this.generateDummyVariables() : this.parseVariables(variables);
-        return this.internalSortRows(rows, sortColumn, sortDirection);
-    });
+    private generateRows: any;
 
     constructor(prop: IVariableExplorerProps) {
         super(prop);
@@ -122,6 +120,19 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
                         sortDirection: 'NONE'};
 
         this.divRef = React.createRef<HTMLDivElement>();
+
+        // Memoize is different between the tests running and webpack. figure out which one
+        // tslint:disable-next-line: no-any
+        let memoize_func : any | undefined;
+        if (memoize instanceof Function) {
+            memoize_func = memoize;
+        } else {
+            memoize_func = memoize.default;
+        }
+        this.generateRows = memoize_func((variables: IJupyterVariable[], sortColumn: string | number, sortDirection: string): IGridRow[] => {
+            const rows = !this.props.skipDefault ? this.generateDummyVariables() : this.parseVariables(variables);
+            return this.internalSortRows(rows, sortColumn, sortDirection);
+        });
     }
 
     public render() {

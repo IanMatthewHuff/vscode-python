@@ -20,4 +20,8 @@ export class MockJupyterManagerFactory implements IJupyterSessionManagerFactory 
     public create(_connInfo: IConnection): Promise<IJupyterSessionManager> {
         return Promise.resolve(this.mockJupyterManager);
     }
+
+    public getManager(): MockJupyterManager {
+        return this.mockJupyterManager;
+    }
 }

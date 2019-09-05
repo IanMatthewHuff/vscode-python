@@ -247,6 +247,7 @@ import { MockDebuggerService } from './mockDebugService';
 import { MockDocumentManager } from './mockDocumentManager';
 import { MockExtensions } from './mockExtensions';
 import { MockJupyterManager, SupportedCommands } from './mockJupyterManager';
+import { MockJupyterManagerFactory } from './mockJupyterManagerFactory';
 import { MockLanguageServer } from './mockLanguageServer';
 import { MockLanguageServerAnalysisOptions } from './mockLanguageServerAnalysisOptions';
 import { MockLiveShareApi } from './mockLiveShare';
@@ -268,7 +269,7 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
     private commandManager: MockCommandManager = new MockCommandManager();
     private setContexts: Record<string, boolean> = {};
     private contextSetEvent: EventEmitter<{ name: string; value: boolean }> = new EventEmitter<{ name: string; value: boolean }>();
-    private jupyterMock: MockJupyterManager | undefined;
+    private jupyterMock: MockJupyterManagerFactory | undefined;
     private shouldMockJupyter: boolean;
     private asyncRegistry: AsyncDisposableRegistry;
     private configChangeEvent = new EventEmitter<ConfigurationChangeEvent>();
@@ -556,7 +557,7 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
 
         // Create our jupyter mock if necessary
         if (this.shouldMockJupyter) {
-            this.jupyterMock = new MockJupyterManager(this.serviceManager);
+            this.jupyterMock = new MockJupyterManagerFactory(this.serviceManager);
         } else {
             this.serviceManager.addSingleton<IProcessServiceFactory>(IProcessServiceFactory, ProcessServiceFactory);
             this.serviceManager.addSingleton<IPythonExecutionFactory>(IPythonExecutionFactory, PythonExecutionFactory);
@@ -666,7 +667,7 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
     }
 
     public get mockJupyter(): MockJupyterManager | undefined {
-        return this.jupyterMock;
+        return this.jupyterMock ? this.jupyterMock.getManager() : undefined;
     }
 
     public get<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>, name?: string | number | symbol): T {

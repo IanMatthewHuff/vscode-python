@@ -3,6 +3,8 @@
 'use strict';
 import './variableExplorer.css';
 
+// tslint:disable-next-line: no-var-requires no-require-imports
+const memoize = require('memoize-one');
 import * as React from 'react';
 
 import { RegExpValues } from '../../client/datascience/constants';
@@ -34,7 +36,6 @@ interface IVariableExplorerProps {
 interface IVariableExplorerState {
     open: boolean;
     gridColumns: {key: string; name: string}[];
-    gridRows: IGridRow[];
     gridHeight: number;
     height: number;
     fontSize: number;
@@ -62,6 +63,10 @@ interface IGridRow {
 
 export class VariableExplorer extends React.Component<IVariableExplorerProps, IVariableExplorerState> {
     private divRef: React.RefObject<HTMLDivElement>;
+    private generateRows = memoize((variables: IJupyterVariable[], sortColumn: string | number, sortDirection: string): IGridRow[] => {
+        const rows = !this.props.skipDefault ? this.generateDummyVariables() : this.parseVariables(variables);
+        return this.internalSortRows(rows, sortColumn, sortDirection);
+    });
 
     constructor(prop: IVariableExplorerProps) {
         super(prop);
@@ -108,10 +113,8 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
                 formatter: <VariableExplorerButtonCellFormatter showDataExplorer={this.props.showDataExplorer} baseTheme={this.props.baseTheme} />
             }
         ];
-        const gridRows = !this.props.skipDefault ? this.generateDummyVariables() : this.parseVariables(this.props.variables);
         this.state = { open: false,
                         gridColumns: columns,
-                        gridRows,
                         gridHeight: 200,
                         height: 0,
                         fontSize: 14,
@@ -160,26 +163,25 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
         }
     }
 
-    public componentDidUpdate(prevProps: Readonly<IVariableExplorerProps>, _prevState: Readonly<IVariableExplorerState>, _snapshot?: {}) {
-        // Might need to reparse
-        const needReparse = !this.variablesSame(prevProps.variables, this.props.variables);
-        if (needReparse && this.props.pendingVariableCount === 0) {
-            const newRows = this.parseVariables(this.props.variables);
-            this.setState({
-                gridRows: this.internalSortRows(newRows, this.state.sortColumn, this.state.sortDirection)
-            });
-        }
-    }
-
     public sortRows = (sortColumn: string | number, sortDirection: string) => {
         this.setState({
             sortColumn,
-            sortDirection,
-            gridRows: this.internalSortRows(this.state.gridRows, sortColumn, sortDirection)
+            sortDirection
         });
     }
 
     private renderGrid() {
+        // Compute our grid rows using a memoized version of the sortColumn, sortDirection, and variables
+        // See this blog post
+        // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
+        const gridRows = this.generateRows(this.props.variables, this.state.sortColumn, this.state.sortDirection);
+        const getRow = (index: number) => {
+            if (index >= 0 && index < gridRows.length) {
+                return gridRows[index];
+            }
+            return {buttons: { supportsDataExplorer: false, name: '', numberOfColumns: 0}, name: '', type: '', size: '', value: ''};
+        };
+
         if (this.state.open) {
             if (this.props.debugging) {
                 return (
@@ -190,8 +192,9 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
                     <div id='variable-explorer-data-grid' role='table' aria-label={getLocString('DataScience.collapseVariableExplorerLabel', 'Variables')}>
                     <AdazzleReactDataGrid
                         columns = {this.state.gridColumns.map(c => { return {...defaultColumnProperties, ...c }; })}
-                        rowGetter = {this.getRow}
-                        rowsCount = {this.state.gridRows.length}
+                        // tslint:disable-next-line: react-this-binding-issue
+                        rowGetter = {getRow}
+                        rowsCount = {gridRows.length}
                         minHeight = {this.state.gridHeight}
                         headerRowHeight = {this.state.fontSize + 9}
                         rowHeight = {this.state.fontSize + 9}
@@ -205,22 +208,6 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
             }
         } else {
             return null;
-        }
-    }
-
-    private variablesSame(a: IJupyterVariable[], b: IJupyterVariable[]) {
-        if (a === b) { return true; }
-        if (a === null || b === null) { return false; }
-        if (a.length !== b.length) { return false; }
-        for (let i = 0; i < a.length; i += 1) {
-            const aVar = a[i];
-            const bVar = b[i];
-            if (aVar.value !== bVar.value) { return false; }
-            if (aVar.name !== bVar.name) { return false; }
-            if (aVar.shape !== bVar.shape) { return false; }
-            if (aVar.size !== bVar.size) { return false; }
-            if (aVar.value !== bVar.value) { return false; }
-            if (aVar.value !== bVar.value) { return false; }
         }
     }
 
@@ -373,12 +360,5 @@ export class VariableExplorer extends React.Component<IVariableExplorerProps, IV
             && row.buttons.name && row.buttons.supportsDataExplorer) {
             this.props.showDataExplorer(row.buttons.name, row.buttons.numberOfColumns);
         }
-    }
-
-    private getRow = (index: number) : IGridRow => {
-        if (index >= 0 && index < this.state.gridRows.length) {
-            return this.state.gridRows[index];
-        }
-        return {buttons: { supportsDataExplorer: false, name: '', numberOfColumns: 0}, name: '', type: '', size: '', value: ''};
     }
 }

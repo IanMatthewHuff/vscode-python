@@ -35,6 +35,7 @@ export class JupyterServerBase implements INotebookServer {
     private serverExitCode: number | undefined;
     private notebooks: Map<string, INotebook> = new Map<string, INotebook>();
     private sessionManager: IJupyterSessionManager | undefined;
+    private savedSession: IJupyterSession | undefined;
 
     constructor(
         _liveShare: ILiveShareApi,
@@ -71,24 +72,25 @@ export class JupyterServerBase implements INotebookServer {
         // Try creating a session just to ensure we're connected. Callers of this function check to make sure jupyter
         // is running and connectable.
         let session: IJupyterSession | undefined;
-        try {
-            session = await this.sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
-            const idleTimeout = this.configService.getSettings().datascience.jupyterLaunchTimeout;
-            // The wait for idle should throw if we can't connect.
-            await session.waitForIdle(idleTimeout);
-        } finally {
-            if (session) {
-                await session.dispose();
-            }
-        }
+        session = await this.sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
+        const idleTimeout = this.configService.getSettings().datascience.jupyterLaunchTimeout;
+        // The wait for idle should throw if we can't connect.
+        await session.waitForIdle(idleTimeout);
+
+        // If that works, save this session for the next notebook to use
+        this.savedSession = session;
     }
 
     public createNotebook(resource: Uri, cancelToken?: CancellationToken): Promise<INotebook> {
         if (!this.sessionManager) {
             throw new Error(localize.DataScience.sessionDisposed());
         }
+        // If we have a saved session send this into the notebook so we don't create a new one
+        const savedSession = this.savedSession;
+        this.savedSession = undefined;
 
-        return this.createNotebookInstance(resource, this.sessionManager, this.disposableRegistry, this.configService, this.loggers, cancelToken);
+        // Create a notebook and return it.
+        return this.createNotebookInstance(resource, this.sessionManager, savedSession, this.disposableRegistry, this.configService, this.loggers, cancelToken);
     }
 
     public async shutdown(): Promise<void> {
@@ -175,6 +177,7 @@ export class JupyterServerBase implements INotebookServer {
     protected createNotebookInstance(
         _resource: Uri,
         _sessionManager: IJupyterSessionManager,
+        _savedSession: IJupyterSession | undefined,
         _disposableRegistry: IDisposableRegistry,
         _configService: IConfigurationService,
         _loggers: INotebookExecutionLogger[],

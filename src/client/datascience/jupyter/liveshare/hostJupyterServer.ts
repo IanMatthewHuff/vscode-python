@@ -17,6 +17,7 @@ import { sendTelemetryEvent } from '../../../telemetry';
 import { Identifiers, LiveShare, LiveShareCommands, RegExpValues, Telemetry } from '../../constants';
 import {
     IDataScience,
+    IJupyterSession,
     IJupyterSessionManager,
     IJupyterSessionManagerFactory,
     INotebook,
@@ -121,6 +122,7 @@ export class HostJupyterServer
     protected async createNotebookInstance(
         resource: vscode.Uri,
         sessionManager: IJupyterSessionManager,
+        possibleSession: IJupyterSession | undefined,
         disposableRegistry: IDisposableRegistry,
         configService: IConfigurationService,
         loggers: INotebookExecutionLogger[],
@@ -129,6 +131,12 @@ export class HostJupyterServer
         // See if already exists.
         const existing = await this.getNotebook(resource);
         if (existing) {
+            // Dispose the possible session as we don't need it
+            if (possibleSession) {
+                await possibleSession.dispose();
+            }
+
+            // Then we can return the existing notebook.
             return existing;
         }
 
@@ -140,8 +148,8 @@ export class HostJupyterServer
             throw this.getDisposedError();
         }
 
-        // Start a session
-        const session = await sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
+        // Start a session (or use the existing one)
+        const session = possibleSession || await sessionManager.startNew(launchInfo.kernelSpec, cancelToken);
         traceInfo(`Started session ${this.id}`);
 
         if (session) {

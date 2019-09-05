@@ -34,6 +34,7 @@ import {
     INotebookExecutionLogger,
     INotebookServer,
     INotebookServerLaunchInfo,
+    internalUseCellKey,
     InterruptResult
 } from '../types';
 
@@ -439,7 +440,7 @@ export class JupyterNotebookBase implements INotebook {
         const deferred = createDeferred<ICell[]>();
 
         // Attempt to evaluate this cell in the jupyter notebook
-        const observable = this.executeObservableImpl(code, Identifiers.EmptyFileName, 0, uuid(), true);
+        const observable = this.executeObservableImpl(`${internalUseCellKey}\n${code}`, Identifiers.EmptyFileName, 0, uuid(), true);
         let output: ICell[];
 
         observable.subscribe(

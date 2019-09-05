@@ -25,6 +25,7 @@ import {
     IFileHashes,
     IJupyterDebugger,
     INotebook,
+    internalUseCellKey,
     ISourceMapRequest
 } from '../types';
 import { JupyterDebuggerNotInstalledError } from './jupyterDebuggerNotInstalledError';
@@ -212,7 +213,7 @@ export class JupyterDebugger implements IJupyterDebugger, ICellHashListener {
     }
 
     private executeSilently(notebook: INotebook, code: string): Promise<ICell[]> {
-        return notebook.execute(code, Identifiers.EmptyFileName, 0, uuid(), undefined, true);
+        return notebook.execute(`${internalUseCellKey}\n${code}`, Identifiers.EmptyFileName, 0, uuid(), undefined, true);
     }
 
     private async ptvsdCheck(notebook: INotebook): Promise<IPtvsdVersion | undefined> {

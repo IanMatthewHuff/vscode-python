@@ -33,7 +33,6 @@ export class JupyterSession implements IJupyterSession {
     private onRestartedEvent: EventEmitter<void> | undefined;
     private statusHandler: Slot<Session.ISession, Kernel.Status> | undefined;
     private connected: boolean = false;
-    private oldSessions: Session.ISession[] = [];
 
     constructor(
         private connInfo: IConnection,
@@ -62,8 +61,6 @@ export class JupyterSession implements IJupyterSession {
         }
         if (this.session) {
             try {
-                traceInfo('Shutdown session - old sessions');
-                await Promise.all(this.oldSessions.map(s => this.shutdownSession(s, undefined)));
                 traceInfo('Shutdown session - current session');
                 await this.shutdownSession(this.session, this.statusHandler);
                 traceInfo('Shutdown session - get restart session');
@@ -123,8 +120,7 @@ export class JupyterSession implements IJupyterSession {
             if (oldStatusHandler) {
                 oldSession.statusChanged.disconnect(oldStatusHandler);
             }
-            // Don't shutdown old sessions yet. This seems to hang tests.
-            this.oldSessions.push(oldSession);
+            this.shutdownSession(oldSession, undefined).ignoreErrors();
         } else {
             throw new Error(localize.DataScience.sessionDisposed());
         }
@@ -215,7 +211,7 @@ export class JupyterSession implements IJupyterSession {
                 tryCount += 1;
                 if (result) {
                     // Cleanup later.
-                    this.oldSessions.push(result);
+                    this.shutdownSession(result, undefined).ignoreErrors();
                 }
                 result = undefined;
                 exception = exc;

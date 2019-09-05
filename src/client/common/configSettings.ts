@@ -23,7 +23,6 @@ import {
     ITerminalSettings,
     ITestingSettings,
     IWorkspaceSymbolSettings,
-    LanguageServerType,
     Resource
 } from './types';
 import { debounceSync } from './utils/decorators';
@@ -36,7 +35,7 @@ const untildify = require('untildify');
 export class PythonSettings implements IPythonSettings {
     private static pythonSettings: Map<string, PythonSettings> = new Map<string, PythonSettings>();
     public downloadLanguageServer = true;
-    public languageServer: LanguageServerType = 'jedi';
+    public jediEnabled = true;
     public jediPath = '';
     public jediMemoryLimit = 1024;
     public envFile = '';
@@ -154,9 +153,9 @@ export class PythonSettings implements IPythonSettings {
         this.poetryPath = poetryPath && poetryPath.length > 0 ? getAbsolutePath(poetryPath, workspaceRoot) : poetryPath;
 
         this.downloadLanguageServer = systemVariables.resolveAny(pythonSettings.get<boolean>('downloadLanguageServer', true))!;
-        this.languageServer = systemVariables.resolveAny(pythonSettings.get<LanguageServerType>('languageServer'))!;
+        this.jediEnabled = systemVariables.resolveAny(pythonSettings.get<boolean>('jediEnabled', true))!;
         this.autoUpdateLanguageServer = systemVariables.resolveAny(pythonSettings.get<boolean>('autoUpdateLanguageServer', true))!;
-        if (this.languageServer === 'jedi') {
+        if (this.jediEnabled) {
             // tslint:disable-next-line:no-backbone-get-set-outside-model no-non-null-assertion
             this.jediPath = systemVariables.resolveAny(pythonSettings.get<string>('jediPath'))!;
             if (typeof this.jediPath === 'string' && this.jediPath.length > 0) {
@@ -210,7 +209,7 @@ export class PythonSettings implements IPythonSettings {
             lintOnSave: false, maxNumberOfProblems: 100,
             mypyArgs: [], mypyEnabled: false, mypyPath: 'mypy',
             banditArgs: [], banditEnabled: false, banditPath: 'bandit',
-            pep8Args: [], pep8Enabled: false, pep8Path: 'pep8',
+            pycodestyleArgs: [], pycodestyleEnabled: false, pycodestylePath: 'pycodestyle',
             pylamaArgs: [], pylamaEnabled: false, pylamaPath: 'pylama',
             prospectorArgs: [], prospectorEnabled: false, prospectorPath: 'prospector',
             pydocstyleArgs: [], pydocstyleEnabled: false, pydocstylePath: 'pydocstyle',
@@ -222,7 +221,7 @@ export class PythonSettings implements IPythonSettings {
                 refactor: DiagnosticSeverity.Hint,
                 warning: DiagnosticSeverity.Warning
             },
-            pep8CategorySeverity: {
+            pycodestyleCategorySeverity: {
                 E: DiagnosticSeverity.Error,
                 W: DiagnosticSeverity.Warning
             },
@@ -242,7 +241,7 @@ export class PythonSettings implements IPythonSettings {
         };
         this.linting.pylintPath = getAbsolutePath(systemVariables.resolveAny(this.linting.pylintPath), workspaceRoot);
         this.linting.flake8Path = getAbsolutePath(systemVariables.resolveAny(this.linting.flake8Path), workspaceRoot);
-        this.linting.pep8Path = getAbsolutePath(systemVariables.resolveAny(this.linting.pep8Path), workspaceRoot);
+        this.linting.pycodestylePath = getAbsolutePath(systemVariables.resolveAny(this.linting.pycodestylePath), workspaceRoot);
         this.linting.pylamaPath = getAbsolutePath(systemVariables.resolveAny(this.linting.pylamaPath), workspaceRoot);
         this.linting.prospectorPath = getAbsolutePath(systemVariables.resolveAny(this.linting.prospectorPath), workspaceRoot);
         this.linting.pydocstylePath = getAbsolutePath(systemVariables.resolveAny(this.linting.pydocstylePath), workspaceRoot);

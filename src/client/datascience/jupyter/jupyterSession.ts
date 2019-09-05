@@ -210,7 +210,6 @@ export class JupyterSession implements IJupyterSession {
                 traceInfo(`Error waiting for restart session: ${exc}`);
                 tryCount += 1;
                 if (result) {
-                    // Cleanup later.
                     this.shutdownSession(result, undefined).ignoreErrors();
                 }
                 result = undefined;

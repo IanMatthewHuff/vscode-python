@@ -182,17 +182,17 @@ export interface INotebookExporter extends Disposable {
     translateToNotebook(cells: ICell[], directoryChange?: string): Promise<JSONObject | undefined>;
 }
 
-export const IDataScienceErrorHandler = Symbol('IDataScienceErrorHandler');
-export interface IDataScienceErrorHandler {
-    handleError(err: Error): Promise<void>;
-}
-
 export const IInteractiveWindowProvider = Symbol('IInteractiveWindowProvider');
 export interface IInteractiveWindowProvider {
     onExecutedCode: Event<string>;
     getActive(): IInteractiveWindow | undefined;
     getOrCreateActive(): Promise<IInteractiveWindow>;
     getNotebookOptions(): Promise<INotebookServerOptions>;
+}
+
+export const IDataScienceErrorHandler = Symbol('IDataScienceErrorHandler');
+export interface IDataScienceErrorHandler {
+    handleError(err: Error): Promise<void>;
 }
 
 export interface IInteractiveBase extends Disposable {

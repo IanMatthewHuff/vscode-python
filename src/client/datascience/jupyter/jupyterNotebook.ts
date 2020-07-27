@@ -148,6 +148,47 @@ class CellSubscriber {
 // https://www.npmjs.com/package/@jupyterlab/services
 
 export class JupyterNotebookBase implements INotebook {
+    public get onDisposed(): Event<void> {
+        return this.disposed.event;
+    }
+    public get onKernelChanged(): Event<IJupyterKernelSpec | LiveKernelModel> {
+        return this.kernelChanged.event;
+    }
+    public get onKernelRestarted(): Event<void> {
+        return this.kernelRestarted.event;
+    }
+
+    public get onKernelInterrupted(): Event<void> {
+        return this.kernelInterrupted.event;
+    }
+    public get kernelSocket(): Observable<KernelSocketInformation | undefined> {
+        return this.session.kernelSocket;
+    }
+
+    public get connection() {
+        return this._executionInfo.connectionInfo;
+    }
+
+    public get onSessionStatusChanged(): Event<ServerStatus> {
+        if (!this.onStatusChangedEvent) {
+            this.onStatusChangedEvent = new EventEmitter<ServerStatus>();
+        }
+        return this.onStatusChangedEvent.event;
+    }
+
+    public get status(): ServerStatus {
+        if (this.session) {
+            return this.session.status;
+        }
+        return ServerStatus.NotStarted;
+    }
+
+    public get resource(): Resource {
+        return this._resource;
+    }
+    public get identity(): Uri {
+        return this._identity;
+    }
     private sessionStartTime: number;
     private pendingCellSubscriptions: CellSubscriber[] = [];
     private ranInitialSetup = false;
@@ -157,29 +198,13 @@ export class JupyterNotebookBase implements INotebook {
     private _workingDirectory: string | undefined;
     private _executionInfo: INotebookExecutionInfo;
     private onStatusChangedEvent: EventEmitter<ServerStatus> | undefined;
-    public get onDisposed(): Event<void> {
-        return this.disposed.event;
-    }
-    public get onKernelChanged(): Event<IJupyterKernelSpec | LiveKernelModel> {
-        return this.kernelChanged.event;
-    }
     private kernelChanged = new EventEmitter<IJupyterKernelSpec | LiveKernelModel>();
-    public get onKernelRestarted(): Event<void> {
-        return this.kernelRestarted.event;
-    }
-
-    public get onKernelInterrupted(): Event<void> {
-        return this.kernelInterrupted.event;
-    }
     private readonly kernelRestarted = new EventEmitter<void>();
     private readonly kernelInterrupted = new EventEmitter<void>();
     private disposed = new EventEmitter<void>();
     private sessionStatusChanged: Disposable | undefined;
     private initializedMatplotlib = false;
     private ioPubListeners = new Set<(msg: KernelMessage.IIOPubMessage, requestId: string) => void>();
-    public get kernelSocket(): Observable<KernelSocketInformation | undefined> {
-        return this.session.kernelSocket;
-    }
 
     constructor(
         _liveShare: ILiveShareApi, // This is so the liveshare mixin works
@@ -210,10 +235,6 @@ export class JupyterNotebookBase implements INotebook {
         this._executionInfo = cloneDeep(executionInfo);
     }
 
-    public get connection() {
-        return this._executionInfo.connectionInfo;
-    }
-
     public async dispose(): Promise<void> {
         if (!this._disposed) {
             this._disposed = true;
@@ -239,27 +260,6 @@ export class JupyterNotebookBase implements INotebook {
                 traceError(`Exception shutting down session `, exc);
             }
         }
-    }
-
-    public get onSessionStatusChanged(): Event<ServerStatus> {
-        if (!this.onStatusChangedEvent) {
-            this.onStatusChangedEvent = new EventEmitter<ServerStatus>();
-        }
-        return this.onStatusChangedEvent.event;
-    }
-
-    public get status(): ServerStatus {
-        if (this.session) {
-            return this.session.status;
-        }
-        return ServerStatus.NotStarted;
-    }
-
-    public get resource(): Resource {
-        return this._resource;
-    }
-    public get identity(): Uri {
-        return this._identity;
     }
 
     public waitForIdle(timeoutMs: number): Promise<void> {
@@ -291,18 +291,21 @@ export class JupyterNotebookBase implements INotebook {
             }
 
             // Run any startup commands that we specified. Support the old form too
-            let setting = settings.runStartupCommands || settings.runMagicCommands;
+            //let setting = settings.runStartupCommands || settings.runMagicCommands;
 
             // Convert to string in case we get an array of startup commands.
-            if (Array.isArray(setting)) {
-                setting = setting.join(`\n`);
-            }
+            //if (Array.isArray(setting)) {
+            //setting = setting.join(`\n`);
+            //}
+
+            const setting = this.loadStartupCommands();
 
             if (setting) {
                 // Cleanup the line feeds. User may have typed them into the settings UI so they will have an extra \\ on the front.
-                const cleanedUp = setting.replace(/\\n/g, '\n');
-                const cells = await this.executeSilently(cleanedUp, cancelToken);
-                traceInfo(`Run startup code for notebook: ${cleanedUp} - results: ${cells.length}`);
+                //const cleanedUp = setting.replace(/\\n/g, '\n');
+                //const cells = await this.executeSilently(cleanedUp, cancelToken);
+                const cells = await this.executeSilently(setting, cancelToken);
+                //traceInfo(`Run startup code for notebook: ${cleanedUp} - results: ${cells.length}`);
             }
 
             traceInfo(`Initial setup complete for ${this.identity.toString()}`);
@@ -729,6 +732,39 @@ export class JupyterNotebookBase implements INotebook {
         } else {
             throw new Error(localize.DataScience.sessionDisposed());
         }
+    }
+
+    // Load and startup commands from our settings
+    private loadStartupCommands(): string {
+        // Run any startup commands that we specified. Support the old form too
+        //let setting = settings.runStartupCommands || settings.runMagicCommands;
+        const newSettingInspect = this.workspace
+            .getConfiguration('python.dataScience', this.resource)!
+            .inspect<string | string[]>('runStartupCommands');
+
+        let setting = newSettingInspect?.globalValue;
+
+        // If nothing set for the new value global check the old value global
+        if (!setting) {
+            const oldSettingInspect = this.workspace
+                .getConfiguration('python.dataScience', this.resource)!
+                .inspect<string | string[]>('runMagicCommands');
+
+            setting = oldSettingInspect?.globalValue;
+        }
+
+        // Convert to string in case we get an array of startup commands.
+        if (Array.isArray(setting)) {
+            setting = setting.join(`\n`);
+        }
+
+        if (setting) {
+            // Cleanup the line feeds. User may have typed them into the settings UI so they will have an extra \\ on the front.
+            return setting.replace(/\\n/g, '\n');
+        }
+
+        // Return empty string if we get nothing
+        return '';
     }
 
     private async initializeMatplotlib(cancelToken?: CancellationToken): Promise<void> {

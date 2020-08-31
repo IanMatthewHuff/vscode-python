@@ -35,7 +35,7 @@ export class VariableView extends WebViewHost<IVariableViewMapping> implements I
             workspaceService,
             (c, v, d) => new VariableViewMessageListener(c, v, d),
             variableViewDir,
-            [path.join(variableViewDir, 'commons.initial.bundle.js'), path.join(variableViewDir, 'dataExplorer.js')],
+            [path.join(variableViewDir, 'commons.initial.bundle.js'), path.join(variableViewDir, 'variableView.js')],
             localize.DataScience.variableViewTitle(),
             ViewColumn.One,
             useCustomEditorApi,

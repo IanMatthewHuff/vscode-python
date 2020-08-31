@@ -35,7 +35,8 @@ function getEntry(bundle) {
             return {
                 plotViewer: ['babel-polyfill', `./src/datascience-ui/plot/index.tsx`],
                 dataExplorer: ['babel-polyfill', `./src/datascience-ui/data-explorer/index.tsx`],
-                startPage: ['babel-polyfill', `./src/datascience-ui/startPage/index.tsx`]
+                startPage: ['babel-polyfill', `./src/datascience-ui/startPage/index.tsx`],
+                variableView: ['babel-polyfill', `./src/datascience-ui/variable-view/index.tsx`]
             };
         default:
             throw new Error(`Bundle not supported ${bundle}`);

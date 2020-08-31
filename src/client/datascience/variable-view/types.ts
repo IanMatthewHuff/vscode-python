@@ -1,4 +1,5 @@
 import { IDisposable } from '../../common/types';
+import { IWebviewViewProvider } from '../types';
 
 // Map all messages to specific payloads
 export type IVariableViewMapping = {
@@ -16,3 +17,6 @@ export const IVariableView = Symbol('IVariableView');
 export interface IVariableView extends IDisposable {
     //showData(dataProvider: IDataViewerDataProvider, title: string): Promise<void>;
 }
+
+export const IVariableViewProvider = Symbol('IVariableViewProvider');
+export interface IVariableViewProvider extends IWebviewViewProvider {}

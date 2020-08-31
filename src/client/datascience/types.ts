@@ -20,7 +20,8 @@ import {
     Range,
     TextDocument,
     TextEditor,
-    Uri
+    Uri,
+    WebviewViewProvider
 } from 'vscode';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import type { Data as WebSocketData } from 'ws';
@@ -1400,3 +1401,5 @@ export interface ISwitchKernelOptions {
     resource: Resource;
     currentKernelDisplayName: string | undefined;
 }
+
+export interface IWebviewViewProvider extends WebviewViewProvider {}

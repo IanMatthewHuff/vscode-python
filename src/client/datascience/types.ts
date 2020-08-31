@@ -1402,4 +1402,6 @@ export interface ISwitchKernelOptions {
     currentKernelDisplayName: string | undefined;
 }
 
-export interface IWebviewViewProvider extends WebviewViewProvider {}
+export interface IWebviewViewProvider extends WebviewViewProvider {
+    readonly viewType: string;
+}

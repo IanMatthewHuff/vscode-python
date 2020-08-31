@@ -332,6 +332,8 @@ import {
     IThemeFinder,
     ITrustService
 } from '../../client/datascience/types';
+import { IVariableViewProvider } from '../../client/datascience/variable-view/types';
+import { VariableViewProvider } from '../../client/datascience/variable-view/variableViewProvider';
 import { ProtocolParser } from '../../client/debugger/extension/helpers/protocolParser';
 import { IProtocolParser } from '../../client/debugger/extension/types';
 import {
@@ -641,6 +643,7 @@ export class DataScienceIocContainer extends UnitTestIocContainer {
             IRawNotebookSupportedService,
             RawNotebookSupportedService
         );
+        this.serviceManager.addSingleton<IVariableViewProvider>(IVariableViewProvider, VariableViewProvider);
         this.serviceManager.addSingleton<IThemeFinder>(IThemeFinder, ThemeFinder);
         this.serviceManager.addSingleton<ICodeCssGenerator>(ICodeCssGenerator, CodeCssGenerator);
         this.serviceManager.addSingleton<IStatusProvider>(IStatusProvider, StatusProvider);

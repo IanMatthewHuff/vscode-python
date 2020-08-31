@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 'use strict';
+import { injectable } from 'inversify';
 import { CancellationToken, Webview, WebviewView, WebviewViewResolveContext } from 'vscode';
 import '../../common/extensions';
 import { IVariableViewProvider } from './types';
 
+@injectable()
 export class VariableViewProvider implements IVariableViewProvider {
-    public static readonly viewType = 'python.dataScience.variableView';
+    public readonly viewType: string = 'python.dataScience.variableView';
 
     private view?: WebviewView;
 
@@ -16,6 +18,9 @@ export class VariableViewProvider implements IVariableViewProvider {
         token: CancellationToken
     ): Thenable<void> | void {
         this.view = webviewView;
+
+        // IANHU: Check options
+        webviewView.webview.options = { enableScripts: true };
 
         webviewView.webview.html = this.getHtml(this.view.webview);
     }

@@ -15,6 +15,7 @@ import { hasCells } from './cellFactory';
 import { CommandRegistry } from './commands/commandRegistry';
 import { EditorContexts, Telemetry } from './constants';
 import { IDataScience, IDataScienceCodeLensProvider } from './types';
+import { IVariableViewProvider } from './variable-view/types';
 
 @injectable()
 export class DataScience implements IDataScience {
@@ -29,7 +30,8 @@ export class DataScience implements IDataScience {
         @inject(IConfigurationService) private configuration: IConfigurationService,
         @inject(IDocumentManager) private documentManager: IDocumentManager,
         @inject(IWorkspaceService) private workspace: IWorkspaceService,
-        @inject(CommandRegistry) private commandRegistry: CommandRegistry
+        @inject(CommandRegistry) private commandRegistry: CommandRegistry,
+        @inject(IVariableViewProvider) private variableViewProvider: IVariableViewProvider
     ) {
         this.disposableRegistry.push(this.commandRegistry);
     }
@@ -43,6 +45,11 @@ export class DataScience implements IDataScience {
 
         this.extensionContext.subscriptions.push(
             vscode.languages.registerCodeLensProvider(PYTHON_ALLFILES, this.dataScienceCodeLensProvider)
+        );
+
+        // Register our webview view providers
+        this.extensionContext.subscriptions.push(
+            vscode.window.registerWebviewViewProvider(this.variableViewProvider.viewType, this.variableViewProvider)
         );
 
         // Set our initial settings and sign up for changes

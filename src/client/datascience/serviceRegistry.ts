@@ -180,6 +180,8 @@ import {
     IThemeFinder,
     ITrustService
 } from './types';
+import { IVariableViewProvider } from './variable-view/types';
+import { VariableViewProvider } from './variable-view/variableViewProvider';
 
 // README: Did you make sure "dataScienceIocContainer.ts" has also been updated appropriately?
 
@@ -230,6 +232,7 @@ export function registerTypes(serviceManager: IServiceManager) {
     serviceManager.addSingleton<INotebookStorage>(INotebookStorage, NativeEditorStorage);
     serviceManager.addSingleton<INotebookStorageProvider>(INotebookStorageProvider, NotebookStorageProvider);
     serviceManager.addSingleton<IRawNotebookProvider>(IRawNotebookProvider, RawNotebookProviderWrapper);
+    serviceManager.addSingleton<IVariableViewProvider>(IVariableViewProvider, VariableViewProvider);
     serviceManager.addSingleton<IRawNotebookSupportedService>(IRawNotebookSupportedService, RawNotebookSupportedService);
     serviceManager.addSingleton<IJupyterNotebookProvider>(IJupyterNotebookProvider, JupyterNotebookProvider);
     serviceManager.add<IPlotViewer>(IPlotViewer, PlotViewer);

@@ -3424,8 +3424,8 @@
             "explorer": [
                 {
                     "type": "webview",
-                    "id": "python_datascience_variableView",
-                    "title": "Variables"
+                    "id": "python.dataScience.variableView",
+                    "name": "Variables"
                 }
             ]
         },

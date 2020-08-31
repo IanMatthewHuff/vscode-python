@@ -112,6 +112,7 @@ export namespace Commands {
     export const NewNotebookRemoveAllCells = 'python.datascience.newNotebook.removeallcells';
     export const NewNotebookExpandAllCells = 'python.datascience.newNotebook.expandallcells';
     export const NewNotebookCollapseAllCells = 'python.datascience.newNotebook.collapseallcells';
+    export const ShowVariableView = 'python.datascience.showVariableView';
 }
 
 export namespace CodeLensCommands {

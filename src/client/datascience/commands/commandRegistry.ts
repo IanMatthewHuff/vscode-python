@@ -101,6 +101,7 @@ export class CommandRegistry implements IDisposable {
             this.enableLoadingWidgetScriptsFromThirdParty
         );
         this.registerCommand(coreCommands.OpenStartPage, this.openStartPage);
+        this.registerCommand(Commands.ShowVariableView, this.showVariableView);
         if (this.commandListeners) {
             this.commandListeners.forEach((listener: IDataScienceCommandListener) => {
                 listener.register(this.commandManager);
@@ -425,6 +426,10 @@ export class CommandRegistry implements IDisposable {
     private async openStartPage(): Promise<void> {
         sendTelemetryEvent(Telemetry.StartPageOpenedFromCommandPalette);
         return this.startPage.open();
+    }
+
+    private async showVariableView(): Promise<void> {
+        // IANHU: Telemetry here
     }
 
     private viewJupyterOutput() {

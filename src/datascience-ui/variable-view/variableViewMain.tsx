@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 'use strict';
-import './mainPanel.css';
+import './variableViewMain.css';
 
 import * as React from 'react';
 
@@ -46,10 +46,18 @@ export class VariableViewMainPanel extends React.Component<IVariableViewMainPane
 
     public render = () => {
         if (!this.state.settings) {
-            return <div className="main-panel" />;
+            return (
+                <div className="main-panel">
+                    <h1>VARIABLES</h1>
+                </div>
+            );
         }
 
-        return <div className="main-panel" ref={this.container}></div>;
+        return (
+            <div className="main-panel" ref={this.container}>
+                <h1>VARIABLES</h1>
+            </div>
+        );
     };
 
     // tslint:disable-next-line:no-any

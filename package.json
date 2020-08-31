@@ -927,6 +927,11 @@
                 "category": "Python"
             },
             {
+                "command": "python.datascience.showVariableView",
+                "title": "%DataScience.variableViewCommandTitle%",
+                "category": "Python"
+            },
+            {
                 "command": "python.analysis.restartLanguageServer",
                 "title": "%python.command.python.analysis.restartLanguageServer.title%",
                 "category": "Python"
@@ -3414,6 +3419,13 @@
                     "id": "python_tests",
                     "name": "Python",
                     "when": "testsDiscovered"
+                }
+            ],
+            "explorer": [
+                {
+                    "type": "webview",
+                    "id": "python_datascience_variableView",
+                    "title": "Variables"
                 }
             ]
         },

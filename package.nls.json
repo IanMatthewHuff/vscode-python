@@ -557,6 +557,7 @@
     "DataScience.unhandledMessage": "Unhandled kernel message from a widget: {0} : {1}",
     "DataScience.qgridWidgetScriptVersionCompatibilityWarning": "Unable to load a compatible version of the widget 'qgrid'. Consider downgrading to version 1.1.1.",
     "DataScience.kernelStarted": "Started kernel {0}",
+    "DataScience.variableViewCommandTitle": "Show Variable View",
     "StartPage.getStarted": "Python - Get Started",
     "StartPage.pythonExtensionTitle": "Python Extension",
     "StartPage.createJupyterNotebook": "Create a Jupyter Notebook",

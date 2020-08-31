@@ -137,6 +137,7 @@
     "DataScience.unknownMimeTypeFormat": "Mime type {0} is not currently supported.",
     "DataScience.historyTitle": "Python Interactive",
     "DataScience.dataExplorerTitle": "Data Viewer",
+    "DataScience.variableViewTitle": "Variables",
     "DataScience.badWebPanelFormatString": "<html><body><h1>{0} is not a valid file name</h1></body></html>",
     "DataScience.sessionDisposed": "Cannot execute code, session has been disposed.",
     "DataScience.rawKernelProcessNotStarted": "Raw kernel process was not able to start.",

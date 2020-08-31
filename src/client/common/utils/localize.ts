@@ -381,6 +381,7 @@ export namespace DataScience {
     );
 
     export const dataExplorerTitle = localize('DataScience.dataExplorerTitle', 'Data Viewer');
+    export const variableViewTitle = localize('DataScience.variableViewTitle', 'Variables');
     export const badWebPanelFormatString = localize(
         'DataScience.badWebPanelFormatString',
         '<html><body><h1>{0} is not a valid file name</h1></body></html>'

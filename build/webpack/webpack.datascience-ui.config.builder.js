@@ -114,6 +114,12 @@ function getPlugins(bundle) {
                         indexUrl: `${constants.ExtensionRootDir}/out/1`,
                         chunks: ['commons', 'startPage'],
                         filename: 'index.startPage.html'
+                    }),
+                    new HtmlWebpackPlugin({
+                        template: 'src/datascience-ui/variable-view/index.html',
+                        indexUrl: `${constants.ExtensionRootDir}/out/1`,
+                        chunks: ['commons', 'variableView'],
+                        filename: 'index.variableView.html'
                     })
                 ]
             );

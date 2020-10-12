@@ -7,9 +7,9 @@
 future==0.18.2 \
     --hash=sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d \
     # via python-jsonrpc-server
-isort==5.3.2 ; python_version >= "3.6" \
-    --hash=sha256:5196bd2f5b23dc91215734b1c96c6d28390061d69860a948094c12635d6d64e6 \
-    --hash=sha256:ba83762132a8661d3525f87a86549712fb7d8da79eeb452e01f327ada9e87920 \
+isort==5.6.3 ; python_version >= "3.6" \
+    --hash=sha256:2c1d044a96c74367ab12188593d134c596747d97aec43b9cdb12eea83b6889d2 \
+    --hash=sha256:3820dd92c3214290cda6351f2ae2cedd5170759bc434af600eaad4f7a82a6ade \
     # via -r requirements.in
 jedi==0.17.2 \
     --hash=sha256:86ed7d9b750603e4ba582ea8edc678657fb4007894a12bcf6f4bb97892f31d20 \
